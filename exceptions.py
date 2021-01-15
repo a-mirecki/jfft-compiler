@@ -35,7 +35,7 @@ class IteratorModification(Exception):
 
 class NotInitialized(Exception):
     def __init__(self, name, message="Error"):
-        self.message = ("Błąd, zmienna nie zainicjalizowana: %s" % name)
+        self.message = ("Błąd, zmienna nie zainicjalizowana: %s" % (name))
         super().__init__(self.message)
 
 class ReusedIterator(Exception):

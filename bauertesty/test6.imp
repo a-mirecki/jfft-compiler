@@ -1,0 +1,44 @@
+[
+    Insertion sort
+
+    Przykladowe dane testowe:
+        1.  ? 6     | ? 6        
+            ? 123   | ? 92    
+            ? 4     | ? 64
+            ? 12    | ? 32    
+            ? 56    | ? 11    
+            ? 13    | ? 82    
+            ? 76    | ? 55    
+            > 4     | > 11
+            > 12    | > 32    
+            > 13    | > 55    
+            > 56    | > 64    
+            > 76    | > 82    
+            > 123   | > 92    
+]
+DECLARE
+	n, tmp, j, j_, tab(1:1000)
+BEGIN
+    READ n;
+    FOR i FROM 1 TO n DO
+        READ tab(i);
+    ENDFOR
+    FOR i FROM 2 TO n DO
+        j := i;
+        j_ := i - 1;
+        WHILE j_ >= 1 DO
+            IF tab(j_) > tab(j) THEN
+                tmp := tab(j_);
+                tab(j_) := tab(j);
+                tab(j) := tmp;
+            ELSE
+                j_ := 1;
+            ENDIF
+            j := j - 1;
+            j_ := j_ - 1;
+        ENDWHILE
+    ENDFOR
+    FOR i FROM 1 TO n DO
+        WRITE tab(i);
+    ENDFOR
+END

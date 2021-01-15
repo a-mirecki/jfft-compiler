@@ -1,0 +1,36 @@
+[
+    Test 8
+    Operacje ze stałą
+
+    Przykladowe dane testowe:
+        1. ? 16
+           > 0
+           > 1
+           > 1
+        2. ? 312
+           > 0
+           > 0
+           > 2
+]
+DECLARE
+	a, b
+BEGIN
+    READ a;
+    a := a + 3;
+    a := 3 + a;
+    a := a - 6;
+    b := 10000 - a;
+    a := 10000 - b;
+    a := a * 3;
+    a := a * 16;
+    a := 2 * a;
+    a := 8 * a;
+    a := a / 48;
+    a := a / 16;
+    b := a % 2;
+    WRITE b;
+    b := a % 3;
+    WRITE b;
+    b := a % 5;
+    WRITE b;
+END

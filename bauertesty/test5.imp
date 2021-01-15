@@ -1,0 +1,18 @@
+[
+    Poprawność pętli for
+
+    Poprawny wynik:
+            > 1
+]
+DECLARE
+	tab(0:4)
+BEGIN
+    tab(0) := 1;
+    FOR _ FROM tab(0) TO 0 DO
+        tab(0) := 0;
+    ENDFOR
+    FOR _ FROM 0 DOWNTO tab(0) DO
+        tab(0) := 0;
+    ENDFOR
+    WRITE tab(0);
+END

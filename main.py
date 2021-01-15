@@ -1,5 +1,4 @@
 import copy
-
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
@@ -7,14 +6,9 @@ from exceptions import *
 import traceback
 
 memoryInd = 0
-instructions, variables, iterators, indexes, arrays, usages, memory, instructionBuffer = [], [], [], [], {}, {}, {}, {}
-initialized = []
+instructions, initialized, declared, iterators, indexes, arrays, usages, memory, instructionBuffer = [], [], [], [], [], {}, {}, {}, {}
 rtol = ["a", "b", "c", "d", "e", "f"]
 bufferId = 0
-
-def check_whether_initialized(a):
-    if str(a) not in initialized:
-        raise NotInitialized(str(a))
 
 def clear_ins_buffer(*args):
     for arg in args:
@@ -31,18 +25,13 @@ def add_commands(commands=None, setBuffer=-1):
     else:
         instructions += commands if commands is not None else []
 
-
-def declare_variable(name, length=None, a=None, b=None, isIterator=False):
+def declare_variable(a):
     global memory, memoryInd
-    if isIterator and name in memory:
-        raise AlreadyDeclared(-1,name)
-
-    memory[name] = memoryInd
-    variables.append(name)
-    if length is not None:
-        memoryInd += length
-        arrays[name] = (a, b)
+    if isinstance(a,tuple):
+        memory[a[1]] = memoryInd
+        memoryInd += (arrays[a[1]][1] - arrays[a[1]][0] + 1) if isinstance(a, tuple) else 1
     else:
+        memory[a] = memoryInd
         memoryInd += 1
 
 def set_mem_reg(addr, bid):
@@ -67,26 +56,6 @@ def set_register(reg, val, bid):
             add_commands([f"INC {rtol[reg]}"], bid)
         if ind < len(binn) - 1:
             add_commands([f"SHL {rtol[reg]}"], bid)
-
-def _for(iterator, _from, _to, reverse, bid):
-    memory[f"{iterator}_e"] = memoryInd
-    reg_to_mem(1, memory[f"{iterator}"], bid-1)
-    reg_to_mem(2, memory[f"{iterator}_e"], bid-1)
-    insBufBack = copy.deepcopy(instructionBuffer[bid+1]) if bid+1 in instructionBuffer else []
-    clear_ins_buffer(bid+1)
-    mem_to_reg(1,memory[f"{iterator}"], bid+1)
-    add_commands([("DEC b" if reverse else "INC b"), "STORE b a"], bid+1)
-    mem_to_reg(2,memory[f"{iterator}_e"], bid+1)
-    add_commands([f"JUMP -{len(instructionBuffer[bid])+len(instructionBuffer[bid+1])+(3 if reverse else 5)}"], bid+1)
-    if reverse:
-        add_commands(["INC c", "SUB b c",
-                 f"JZERO b {len(instructionBuffer[bid])+len(instructionBuffer[bid+1])+1}"]
-                 + instructionBuffer[bid] + instructionBuffer[bid+1], bid-1)
-    else:
-        add_commands(["INC c", "SUB c b", "RESET b", "ADD b c",
-                      f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"]
-                     + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
-    instructionBuffer[bid+1] = insBufBack
 
 def _for(iterator, _from, _to, reverse, bid):
     global memoryInd, instructionBuffer
@@ -125,10 +94,12 @@ def obtain_tab_value(tab, reg, bid):
     obtain_tab_address(tab, reg, bid)
     add_commands([f"LOAD {rtol[reg]} a"], bid)
 
+
 def assign(a, b, bid):
+    if a in iterators and a in declared:
+        raise AlreadyDeclared(-1, a)
     if a in iterators and a in memory:
         raise IteratorModification(-1, a)
-    # TODO: dokładny warunek inicjalizacji tablicy
     elif a in iterators and a not in memory:
         raise NotDeclared(-1, a)
 
@@ -149,12 +120,14 @@ def assign(a, b, bid):
         obtain_tab_address(a, 2, bid)
         add_commands(["STORE b a"], bid)
 
-    if str(a) not in initialized:
-        initialized.append(str(a))
-
-
 def evaluate_io(a, reg, bid, isWrite):
     global memoryInd
+    if isWrite and a not in initialized:
+        declare_variable(a)
+        initialized.append(a)
+    elif (not isinstance(a, tuple) or (isinstance(a, tuple) and a[0] == 'tab')) and not isinstance(a, int) and not isWrite and a not in initialized :
+        raise NotInitialized(str(a))
+
     if isinstance(a, str):
         set_register(0, memory[a], bid)
         if isWrite:
@@ -340,20 +313,20 @@ def p_declarations_array(p):
     ind = 1 if len(p) == 7 else 3
     if p[ind + 2] > p[ind + 4]:
         raise InvalidArrayRange(p.lexer.lineno, p[ind + 2], p[ind + 4])
-    p[0] = p[ind] if p[ind] not in variables else False
+    p[0] = p[ind] if p[ind] not in declared else False
     if not p[0]:
         raise AlreadyDeclared(p.lexer.lineno, p[ind])
-    declare_variable(p[ind], p[ind + 4] - p[ind + 2] + 1, p[ind + 2], p[ind + 4])
-
+    declared.append(p[ind])
+    arrays[p[ind]] = (p[ind + 2],p[ind + 4])
 
 def p_declarations_pid(p):
     ''' declarations 	: PID
 			            | declarations COMMA PID '''
     ind = 1 if len(p) == 2 else 3
-    p[0] = p[ind] if p[ind] not in variables else False
+    p[0] = p[ind] if p[ind] not in declared else False
     if not p[0]:
         raise AlreadyDeclared(p.lexer.lineno, p[ind])
-    declare_variable(p[ind])
+    declared.append(p[ind])
 
 
 def p_commands(p):
@@ -389,7 +362,6 @@ def p_command_repeat_until(p):
 
 def p_iterator(p):
     ''' iterator	: PID '''
-    # TODO: Sprawdzanie czy okej
     p[0] = p[1]
     if p[1] in memory:
         raise AlreadyDeclared(p.lexer.lineno, p[1])
@@ -443,7 +415,7 @@ def p_value_identifier(p):
 
 def p_identifier_pid(p):
     '''identifier	: PID '''
-    if p[1] not in memory and p[1] not in iterators:
+    if p[1] not in declared and p[1] not in iterators:
         raise NotDeclared(p.lexer.lineno, p[1])
     if p[1] in arrays:
         raise NotAVariable(p.lexer.lineno, p[1])
@@ -453,7 +425,7 @@ def p_identifier_pid(p):
 def p_identifier_tab_id(p):
     '''identifier	: PID LBRACKET PID RBRACKET
                     | PID LBRACKET NUM RBRACKET '''
-    if p[1] not in memory:
+    if p[1] not in declared:
         raise NotDeclared(p.lexer.lineno, p[1])
     if p[1] not in arrays:
         raise NotAnArray(p.lexer.lineno, p[1])
@@ -483,17 +455,15 @@ def evaluate(ex, bid=0, justassign=False):
     elif isinstance(ex, tuple):
         if ex[0] == 'read' or ex[0] == 'write':
             io(evaluate(ex[1], bid, (True if ex[0] == 'read' else False)), bid, True if ex[0] == 'read' else False)
-        elif ex[0] == 'while':
+        elif ex[0] == 'while' or ex[0] == 'repeat':
             clear_ins_buffer(bid+1, bid+2)
             evaluate(ex[1], bid + 1)
             evaluate(ex[2], bid + 2)
-            _while(bid + 1, bid + 2, )
-        elif ex[0] == 'repeat':
-            clear_ins_buffer(bid+1, bid+2)
-            evaluate(ex[2], bid + 1)
-            evaluate(ex[1], bid + 2)
-            _repeatuntil(bid + 1, bid + 2)
-        elif ex[0] == 'for':
+            if ex[0] == 'while':
+                _while(bid + 1, bid + 2, )
+            else:
+                _repeatuntil(bid+1,bid+1)
+        elif ex[0] == 'downfor' or ex[0] == 'for':
             if ex[1] in initialized:
                 raise ReusedIterator(ex[1])
             memory[evaluate(ex[1], bid, True)] = memoryInd
@@ -503,17 +473,9 @@ def evaluate(ex, bid=0, justassign=False):
             initialized.append(ex[1])
             clear_ins_buffer(bid + 1)
             evaluate(ex[4], bid + 1)
-            _for(ex[1], _from, _to, False, bid+1)
+            _for(ex[1], _from, _to, False if ex[0] == 'for' else True, bid + 1)
             initialized.remove(evaluate(ex[1], bid))
             del memory[ex[1]]
-        elif ex[0] == 'downfor':
-            memory[ex[1]] = memoryInd
-            memoryInd += 1
-            initialized.append(ex[1])
-            clear_ins_buffer(bid + 1)
-            evaluate(ex[4], bid + 1)
-            _for(ex[1], evaluate(ex[2], bid), evaluate(ex[3], bid), True, bid + 1)
-            initialized.remove(evaluate(ex[1], bid))
         elif ex[0] == 'if':
             clear_ins_buffer(bid+1)
             evaluate(ex[1], bid)
@@ -531,16 +493,28 @@ def evaluate(ex, bid=0, justassign=False):
             functions[ex[0]](evaluate(ex[1], bid), evaluate(ex[2], bid), bid)
         elif ex[0] == '/' or ex[0] == '%':
             div(evaluate(ex[1], bid), evaluate(ex[2], bid), bid, True if ex[0] == '%' else False)
-        elif ex[0] == 'tab':
-            return (ex[0], ex[1], ex[2] - arrays[ex[1]][0])
-        elif ex[0] == 'tabi':
-            indexes.append(memory[evaluate(ex[2],bid)])
+        elif ex[0] == 'tab' or ex[0] == 'tabi':
+            if ex[1] not in initialized:
+                declare_variable(ex)
+                initialized.append(ex[1])
+            if ex not in initialized and ex[0] == 'tab':
+                initialized.append(ex)
+            if ex[0] == 'tab':
+                if (ex[0], ex[1], ex[2] - arrays[ex[1]][0]) not in initialized and not justassign:
+                    raise NotInitialized(f"{ex[1]}({ex[2]})")
+                return (ex[0], ex[1], ex[2] - arrays[ex[1]][0])
+            else:
+                if ex[2] not in initialized and not justassign:
+                    raise NotInitialized(f"{ex[1]}({ex[2]})")
+                indexes.append(memory[evaluate(ex[2], bid)])
         return ex
     else:
         if isinstance(ex, str) and ex not in initialized and not justassign:
             raise NotInitialized(ex)
+        if ex not in initialized and ex not in iterators:
+            declare_variable(ex)
+            initialized.append(ex)
         return ex
-
 
 parser = yacc.yacc()
 
@@ -551,4 +525,3 @@ with open(sys.argv[1], 'r') as fp:
         print('\n'.join(instructions))
     except Exception as e:
         print(traceback.format_exc())
-

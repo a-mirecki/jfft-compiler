@@ -1,0 +1,36 @@
+[
+    Test 3
+    Poprawne usuwanie bezużytecznych pętli
+
+    Przykladowe dane testowe:
+        1. ? 30
+           > 0
+           > 30
+        2. ? 100
+           > 100
+           > 0
+]
+DECLARE
+	a, b, j, i, tab_a(0:1000), tab_b(0:1000)
+BEGIN
+    i := 0;
+    b := 3;
+    REPEAT
+        i := i + 1;
+        b := b * i;
+    UNTIL i = 66;
+    READ a;
+    j := 0;
+    WHILE j <= a DO
+        tab_a(j) := a;
+        tab_b(j) := 0;
+        j := j + 1;
+    ENDWHILE
+    WHILE j <= 1000 DO
+        tab_b(j) := a;
+        tab_a(j) := 0;
+        j := j + 1;
+    ENDWHILE
+    WRITE tab_a(i);
+    WRITE tab_b(i);
+END
