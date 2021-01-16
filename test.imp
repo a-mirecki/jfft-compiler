@@ -8,20 +8,7 @@
 DECLARE
 	a, b
 BEGIN
-	READ a;
-	a := 5 + a;
-	b := a - 2047;
-	b := b / 1;
-    a := a * 1;
-	IF a < b THEN
-		WRITE 111111;
-	ELSE
-		WRITE a;
-	ENDIF
-	IF b <= a THEN
-		WRITE b;
-	ELSE
-		WRITE 111111;
-	ENDIF
+    b := 1024;
+	a := b * 512;
 END
 
