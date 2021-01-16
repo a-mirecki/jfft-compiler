@@ -148,7 +148,6 @@ def io(a, bid, isRead):
 
 def evaluate_operation(a, b, c, bid, rega=1, regb=2, performOperation=True):
     add_commands(setBuffer=bid)
-    # ('tabi', 'tab', 'j') ('tab', 'tab', 0)
     if isinstance(a, int) and isinstance(b, int) and performOperation:
         set_register(1, c, bid)
     else:
@@ -208,31 +207,36 @@ def _repeatuntil(b1, b2):
                 f"JUMP -{len(instructionBuffer[b1]) + len(instructionBuffer[b2]) + 2}"], b1 - 1)
 
 def add(a, b, bid):
-    if a != 0 and b != 0 and evaluate_operation(a, b, a + b if isinstance(a, int) and isinstance(b, int) else -1, bid):
+    if b != 0 and evaluate_operation(a, b, a + b if isinstance(a, int) and isinstance(b, int) else -1, bid) and b != 0:
         add_commands(["ADD b c"], bid)
 
 def sub(a, b, bid):
-    if a != 0 and b != 0 and evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid):
+    if evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid) and b != 0:
         add_commands(["SUB b c"], bid)
 
 def mul(a, b, bid):
-    if a != 1 and b != 1 and evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4):
-        add_commands(["RESET a", "ADD a e", "SUB a c", "JZERO a 13", 'RESET a', 'ADD a c',
+    if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4):
+        if b == 1:
+            add_commands(["RESET b", "ADD b e"], bid)
+        elif a == 2:
+            add_commands(["RESET b","ADD b c", "SHL b"], bid)
+        else:
+            add_commands(["RESET a", "ADD a e", "SUB a c", "JZERO a 13", 'RESET a', 'ADD a c',
                       'RESET d', 'ADD d e', 'RESET b', 'JZERO d 19', 'JODD d 2', 'JUMP 2', 'ADD b a',
                       'SHL a', 'SHR d', 'JUMP -6', 'RESET a', 'ADD a e', 'RESET d', 'ADD d c', 'RESET b',
-                      'JZERO d 7', 'JODD d 2', 'JUMP 2', 'ADD b a', 'SHL a', 'SHR d', 'JUMP -6'], bid)
+                      'JZERO d 7', 'JODD d 2', 'JUMP 2', 'ADD b a', 'SHL a', 'SHR d', 'JUMP -6'] if b != 2 else ["SHL b"], bid)
 
-def div(x, y, bid, modulo=False):
-    if x == 0 or y == 0:
+def div(a, b, bid, modulo=False):
+    if a == 0 or b == 0:
         return set_register(1, 0, bid)
-    c = x % y if modulo and isinstance(x, int) and isinstance(y, int) else (
-        x // y if isinstance(x, int) and isinstance(y, int) else -1)
-    if y != 1 and evaluate_operation(x, y, c, bid, 1, 5):
+    c = a % b if modulo and isinstance(a, int) and isinstance(b, int) else (
+        a // b if isinstance(a, int) and isinstance(b, int) else -1)
+    if evaluate_operation(a, b, c, bid, 1, 5) and (b != 1 or modulo):
         add_commands(['RESET a', 'ADD a b', 'JZERO f 27', 'RESET d', 'ADD d f', 'RESET c', 'ADD c d', 'SUB c a',
                       'JZERO c 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET c', 'RESET e', 'ADD e d', 'SUB e a',
                       'JZERO e 4', 'SHL c', 'SHR d', 'JUMP 5', 'SHL c', 'INC c', 'SUB a d', 'SHR d',
                       'RESET e', 'ADD e f', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET a', 'RESET c',
-                      'RESET b', 'ADD b a' if modulo else 'ADD b c'], bid)
+                      'RESET b', 'ADD b a' if modulo else 'ADD b c'] if b != 2 or modulo else ["SHR b"], bid)
 
 functions = {'+': add, '-': sub, '*': mul, '=': eq, '!=' : neq, '>' : gt, '<' : lt, '>=' : ge, '<=' : le}
 

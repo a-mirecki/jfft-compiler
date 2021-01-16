@@ -1,18 +1,27 @@
-[
-    Test 12
-    Sprawdza czy liczba jest palindromem
+[ cond1.imp - instrukcje warunkowe
 
-    Przykladowe dane testowe:
-        1. ? 1234567654321
-           > 1
-        2. ? 1234321
-           > 1
-        3. ? 12345
+        Przykladowe dane testowe:
+        1. ? 2030
+           > 2035
            > 0
 ]
 DECLARE
-    a
+	a, b
 BEGIN
-    a := 0 / 5;
-    WRITE a;
+	READ a;
+	a := 5 + a;
+	b := a - 2047;
+	b := b / 1;
+    a := a * 1;
+	IF a < b THEN
+		WRITE 111111;
+	ELSE
+		WRITE a;
+	ENDIF
+	IF b <= a THEN
+		WRITE b;
+	ELSE
+		WRITE 111111;
+	ENDIF
 END
+
