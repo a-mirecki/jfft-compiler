@@ -1,29 +1,30 @@
 [
-    Test 9
-    Tablica ciągu Fibbonaciego
+    Test 12
+    Sprawdza czy liczba jest palindromem
 
-        Przykladowe dane testowe:
-        1.  ? 1000
-            > 43466557686937456435688527675040625802564660517
-              37178040248172908953655541794905189040387984007
-              92551692959225930803226347752096896232398733224
-              71161642996440906533187938298969649928516003704
-              476137795166849228875
-        2. > 6
-           > 8
-        3. ? 100
-           > 354224848179261915075
+    Przykladowe dane testowe:
+        1. ? 1234567654321
+           > 1
+        2. ? 1234321
+           > 1
+        3. ? 12345
+           > 0
 ]
 DECLARE
-	j, k, tab(0:10000)
+    a, copy, rev, tmp
 BEGIN
-    tab(0) := 0;
-    tab(1) := 1;
-    FOR i FROM 2 TO 10000 DO
-        j := i - 1;
-        k := i - 2;
-        tab(i) := tab(j) + tab(k);
-    ENDFOR
-    READ k;
-    WRITE tab(k);
+    READ a;
+    copy := a;
+    rev := 0;
+    WHILE a != 0 DO
+        tmp := a % 10;
+        rev := rev * 10;
+        rev := tmp + rev;
+        a := a / 10;
+    ENDWHILE
+    IF copy = rev THEN
+        WRITE 1;
+    ELSE
+        WRITE 0;
+    ENDIF
 END

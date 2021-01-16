@@ -129,7 +129,7 @@ def evaluate_io(a, reg, bid, isRead):
     global memoryInd
 
     if isinstance(a, str):
-        if a in iterators and a in memory:
+        if a in iterators and a in memory and isRead:
             raise IteratorModification(a)
         set_register(0, memory[a], bid)
     elif isinstance(a, int):
