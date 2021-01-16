@@ -208,26 +208,26 @@ def _repeatuntil(b1, b2):
                 f"JUMP -{len(instructionBuffer[b1]) + len(instructionBuffer[b2]) + 2}"], b1 - 1)
 
 def add(a, b, bid):
-    if evaluate_operation(a, b, a + b if isinstance(a, int) and isinstance(b, int) else -1, bid):
+    if a != 0 and b != 0 and evaluate_operation(a, b, a + b if isinstance(a, int) and isinstance(b, int) else -1, bid):
         add_commands(["ADD b c"], bid)
 
 def sub(a, b, bid):
-    if evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid):
+    if a != 0 and b != 0 and evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid):
         add_commands(["SUB b c"], bid)
 
-def mul(x, y, bid):
-    if evaluate_operation(x, y, x * y if isinstance(x, int) and isinstance(y, int) else -1, bid, 4):
+def mul(a, b, bid):
+    if a != 1 and b != 1 and evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4):
         add_commands(["RESET a", "ADD a e", "SUB a c", "JZERO a 13", 'RESET a', 'ADD a c',
                       'RESET d', 'ADD d e', 'RESET b', 'JZERO d 19', 'JODD d 2', 'JUMP 2', 'ADD b a',
                       'SHL a', 'SHR d', 'JUMP -6', 'RESET a', 'ADD a e', 'RESET d', 'ADD d c', 'RESET b',
                       'JZERO d 7', 'JODD d 2', 'JUMP 2', 'ADD b a', 'SHL a', 'SHR d', 'JUMP -6'], bid)
 
 def div(x, y, bid, modulo=False):
-    if isinstance(y, int) and y == 0:
+    if x == 0 or y == 0:
         return set_register(1, 0, bid)
     c = x % y if modulo and isinstance(x, int) and isinstance(y, int) else (
         x // y if isinstance(x, int) and isinstance(y, int) else -1)
-    if evaluate_operation(x, y, c, bid, 1, 5):
+    if y != 1 and evaluate_operation(x, y, c, bid, 1, 5):
         add_commands(['RESET a', 'ADD a b', 'JZERO f 27', 'RESET d', 'ADD d f', 'RESET c', 'ADD c d', 'SUB c a',
                       'JZERO c 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET c', 'RESET e', 'ADD e d', 'SUB e a',
                       'JZERO e 4', 'SHL c', 'SHR d', 'JUMP 5', 'SHL c', 'INC c', 'SUB a d', 'SHR d',

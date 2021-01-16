@@ -11,20 +11,8 @@
            > 0
 ]
 DECLARE
-    a, copy, rev, tmp
+    a
 BEGIN
-    READ a;
-    copy := a;
-    rev := 0;
-    WHILE a != 0 DO
-        tmp := a % 10;
-        rev := rev * 10;
-        rev := tmp + rev;
-        a := a / 10;
-    ENDWHILE
-    IF copy = rev THEN
-        WRITE 1;
-    ELSE
-        WRITE 0;
-    ENDIF
+    a := 0 / 5;
+    WRITE a;
 END
