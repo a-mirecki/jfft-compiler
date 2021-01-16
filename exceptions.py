@@ -42,3 +42,8 @@ class ReusedIterator(Exception):
     def __init__(self, name, message="Error"):
         self.message = ("Błąd, ponowne użycie iteratora %s" % name)
         super().__init__(self.message)
+
+class InvalidArrayElement(Exception):
+    def __init__(self, index, name, message="Error"):
+        self.message = ("Indeks %s nie istnieje tablicy %s " % (index,name))
+        super().__init__(self.message)
