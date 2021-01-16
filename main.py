@@ -1,6 +1,5 @@
 import copy
 import math
-
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
@@ -235,17 +234,16 @@ def sub(a, b, bid):
             add_commands(["SUB b c"], bid)
 
 def mul(a, b, bid):
+    if a == 0 or b == 0:
+        return set_register(1, 0, bid)
     if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4, loadA=(a != 0
-            and a != 1 and not (isinstance(a, int) and a & (a - 1) == 0 and a != 0)), loadB=(b != 0 and b != 1 and not (isinstance(b, int) and b & (b - 1) == 0 and b != 0))):
-
-        if a == 0 or b == 0:
-            return set_register(1, 0, bid)
-        elif b == 1 or a == 1:
+            and a != 1 and not (isinstance(a, int) and a & (a - 1) == 0)), loadB=(b != 0 and b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
+        if b == 1 or a == 1:
             add_commands(["RESET b", "ADD b %s" % ("e" if b == 1 else "c")], bid)
         elif isinstance(b, int) and b & (b - 1) == 0 or isinstance(a, int) and a & (a - 1) == 0:
             isBPower = isinstance(b, int) and b & (b - 1) == 0
             power = int(math.log2(b)) if isBPower else int(math.log2(a))
-            add_commands(["RESET b", "ADD b %s" % ("e" if isBPower else "c"), "SHL b"*power], bid)
+            add_commands(["RESET b", "ADD b %s" % ("e" if isBPower else "c")] + ["SHL b"]*power, bid)
         else:
             add_commands(["RESET a", "ADD a e", "SUB a c", "JZERO a 13", 'RESET a', 'ADD a c',
                           'RESET d', 'ADD d e', 'RESET b', 'JZERO d 19', 'JODD d 2', 'JUMP 2', 'ADD b a',
@@ -257,10 +255,10 @@ def div(a, b, bid, modulo=False):
         return set_register(1, 0, bid)
     c = a % b if modulo and isinstance(a, int) and isinstance(b, int) else (
         a // b if isinstance(a, int) and isinstance(b, int) else -1)
-    if evaluate_operation(a, b, c, bid, 1, 5, loadB=((b != 1 and not isinstance(b, int) and b & (b - 1) == 0) or modulo) and (b != 1 or modulo)):
+    if evaluate_operation(a, b, c, bid, 1, 5, loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0)) or modulo) and (b != 1 or modulo)):
         if isinstance(b, int) and b & (b - 1) == 0 and not modulo:
             power = int(math.log2(b))
-            add_commands(["SHR b"*power], bid)
+            add_commands(["SHR b"]*power, bid)
         else:
             add_commands(['RESET a', 'ADD a b', 'JZERO f 27', 'RESET d', 'ADD d f', 'RESET c', 'ADD c d', 'SUB c a',
                       'JZERO c 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET c', 'RESET e', 'ADD e d', 'SUB e a',
