@@ -451,11 +451,10 @@ def evaluate(ex, bid=0, justassign=False):
         if ex[0] == 'read' or ex[0] == 'write':
             io(evaluate(ex[1], bid, (True if ex[0] == 'read' else False)), bid, True if ex[0] == 'read' else False)
         elif ex[0] == 'while' or ex[0] == 'repeat':
-            clear_ins_buffer(bid + 1)
             evaluate(ex[1], bid + 1)
-            clear_ins_buffer(bid + 2)
             evaluate(ex[2], bid + 2)
             _while(bid + 1, bid + 2) if ex[0] == 'while' else _repeatuntil(bid + 1, bid + 2)
+            clear_ins_buffer(bid + 1, bid+2)
         elif ex[0] == 'downfor' or ex[0] == 'for':
             if ex[1] in initialized:
                 raise ReusedIterator(ex[1])
@@ -464,20 +463,21 @@ def evaluate(ex, bid=0, justassign=False):
             _from = evaluate(ex[2], bid)
             _to = evaluate(ex[3], bid)
             initialized.append(ex[1])
-            clear_ins_buffer(bid + 1)
             evaluate(ex[4], bid + 1)
             _for(ex[1], _from, _to, False if ex[0] == 'for' else True, bid + 1)
             initialized.remove(evaluate(ex[1], bid))
             del memory[ex[1]]
             uiterators.remove(ex[1])
-        elif ex[0] == 'if' or ex[0] == 'ifelse':
             clear_ins_buffer(bid + 1)
+        elif ex[0] == 'if' or ex[0] == 'ifelse':
             evaluate(ex[1], bid)
             evaluate(ex[2], bid + 1)
             if ex[0] == 'ifelse':
-                clear_ins_buffer(bid + 2)
                 evaluate(ex[3], bid + 2)
             _if(bid + 1) if ex[0] == 'if' else _ifelse(bid + 1, bid + 2)
+            clear_ins_buffer(bid + 1)
+            if ex[0] == 'ifelse':
+                clear_ins_buffer(bid + 2)
         elif ex[0] == 'assign':
             assign(evaluate(ex[1], bid, True), evaluate(ex[2], bid), bid)
         elif ex[0] in functions:
@@ -517,7 +517,6 @@ def compi(infi, save=False):
     global memoryInd, bufferId, instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer
     memoryInd, bufferId = 0, 0
     instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer = [], [], [], [], [], [], {}, {}, {}, {}
-    rtol = ["a", "b", "c", "d", "e", "f"]
     with open(infi, 'r') as fp:
         content = fp.read()
         try:
