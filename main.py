@@ -513,10 +513,22 @@ def evaluate(ex, bid=0, justassign=False):
 
 parser = yacc.yacc()
 
-with open(sys.argv[1], 'r') as fp:
-    content = fp.read()
-    try:
-        parser.parse(content)
-        print('\n'.join(instructions))
-    except Exception as e:
-        print(traceback.format_exc())
+def compi(infi, save=False):
+    global memoryInd, bufferId, instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer
+    memoryInd, bufferId = 0, 0
+    instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer = [], [], [], [], [], [], {}, {}, {}, {}
+    rtol = ["a", "b", "c", "d", "e", "f"]
+    with open(infi, 'r') as fp:
+        content = fp.read()
+        try:
+            parser.parse(content)
+            if save:
+                f = open("out.mr", 'w')
+                f.write('\n'.join(instructions))
+                f.close()
+            else:
+                print('\n'.join(instructions))
+        except Exception as e:
+            print(traceback.format_exc())
+
+compi(sys.argv[1])
