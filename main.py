@@ -1,5 +1,6 @@
 import copy
 import math
+import traceback
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
@@ -413,8 +414,8 @@ def p_operation(p):
                   | value MUL value
                   | value DIV value
                   | value MOD value'''
-    check_variable(p[1], p.lineno(1))
-    check_variable(p[3], p.lineno(3))
+    check_variable(p[1], p.lineno(2))
+    check_variable(p[3], p.lineno(2))
     p[0] = (p[2], p[1], p[3])
 
 def p_condition(p):
@@ -424,8 +425,8 @@ def p_condition(p):
                   | value GREATER value
                   | value LOWEREQUAL value
                   | value GREATEREQUAL value'''
-    check_variable(p[1], p.lineno(1))
-    check_variable(p[3], p.lineno(3))
+    check_variable(p[1], p.lineno(2))
+    check_variable(p[3], p.lineno(2))
     p[0] = (p[2], p[1], p[3])
 
 def p_value_NUM(p):
