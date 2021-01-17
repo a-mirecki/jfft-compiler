@@ -4,7 +4,7 @@ import ply.lex as lex
 import ply.yacc as yacc
 import sys
 from exceptions import *
-import traceback
+import argparse
 
 ''' CODE GOLF COMPILER - Arkadiusz Mirecki 250071 '''
 memoryInd, bufferId = 0, 0
@@ -524,22 +524,18 @@ def evaluate(ex, bid=0, justassign=False):
 
 parser = yacc.yacc()
 
-def compi(infi, save=False):
-    global memoryInd, bufferId, instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer
-    memoryInd, bufferId = 0, 0
-    instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer = [], [], [], [], [], [], {}, {}, {}, {}
-    with open(infi, 'r') as fp:
-        content = fp.read()
-        try:
-            parser.parse(content)
-            if save:
-                f = open("out.mr", 'w')
-                f.write('\n'.join(instructions))
-                f.close()
-            else:
-                print('\n'.join(instructions))
-        except Exception as e:
-            print(traceback.format_exc())
+argp = argparse.ArgumentParser()
+argp.add_argument('input', help='input file (*.imp)')
+argp.add_argument('output', help='output file (*.mr)')
+args = argp.parse_args()
 
-
-compi(sys.argv[1])
+with open(args.input, 'r') as fp:
+    content = fp.read()
+    try:
+        parser.parse(content)
+        f = open(args.output, 'w')
+        f.write('\n'.join(instructions))
+        f.close()
+        print("Kompilacja i zapis zakończone pomyślnie")
+    except Exception as e:
+        print(e)
