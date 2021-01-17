@@ -249,16 +249,16 @@ def div(a, b, bid, modulo=False):
         return set_register(1, 0, bid)
     c = a % b if modulo and isinstance(a, int) and isinstance(b, int) else (
         a // b if isinstance(a, int) and isinstance(b, int) else -1)
-    if evaluate_operation(a, b, c, bid, 1, 5, loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0)) or modulo) and (b != 1 or modulo)):
+    if evaluate_operation(a, b, c, bid, loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0)) or modulo) and (b != 1 or modulo)):
         if isinstance(b, int) and b & (b - 1) == 0 and not modulo:
             power = int(math.log2(b))
             add_commands(["SHR b"]*power, bid)
         else:
-            add_commands(['RESET a', 'ADD a b', 'JZERO f 27', 'RESET d', 'ADD d f', 'RESET c', 'ADD c d', 'SUB c a',
-                      'JZERO c 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET c', 'RESET e', 'ADD e d', 'SUB e a',
-                      'JZERO e 4', 'SHL c', 'SHR d', 'JUMP 5', 'SHL c', 'INC c', 'SUB a d', 'SHR d',
-                      'RESET e', 'ADD e f', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET a', 'RESET c',
-                      'RESET b', 'ADD b a' if modulo else 'ADD b c'])
+            add_commands(['JZERO c 27', 'RESET d', 'ADD d c', 'RESET f', 'ADD f d', 'SUB f b',
+                      'JZERO f 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET f', 'RESET e', 'ADD e d', 'SUB e b',
+                      'JZERO e 4', 'SHL f', 'SHR d', 'JUMP 5', 'SHL f', 'INC f', 'SUB b d', 'SHR d',
+                      'RESET e', 'ADD e c', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET b', 'RESET f',
+                      'RESET a', 'ADD a b' if modulo else 'ADD a f'])
 
 functions = {'+': add, '-': sub, '*': mul, '=': eq, '!=': neq, '>': gt, '<': lt, '>=': ge, '<=': le}
 
