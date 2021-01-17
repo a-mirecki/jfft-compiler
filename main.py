@@ -496,6 +496,7 @@ def evaluate(ex, bid=0, justassign=False):
             _from = evaluate(ex[2], bid)
             _to = evaluate(ex[3], bid)
             initialized.append(ex[1])
+            uiterators.append(ex[1])
             evaluate(ex[4], bid + 1)
             _for(ex[1], _from, _to, False if ex[0] == 'for' else True, bid + 1)
             initialized.remove(evaluate(ex[1], bid))
@@ -524,10 +525,10 @@ def evaluate(ex, bid=0, justassign=False):
                 indexes.append(memory[evaluate(ex[2], bid)])
         return ex
     else:
-        if isinstance(ex, str) and ex in iterators and ex not in uiterators and  not justassign: # TEST
-            uiterators.append(ex)
         if isinstance(ex, str) and ex not in declared and ex not in iterators and not justassign:
             raise NotDeclared(str(ex))
+        if isinstance(ex, str) and ex in iterators and ex not in uiterators and not justassign:
+            raise NotDeclared(ex)
         if isinstance(ex, str) and ex not in initialized and not justassign:
             raise NotInitialized(ex)
         return ex
