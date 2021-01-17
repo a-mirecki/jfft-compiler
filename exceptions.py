@@ -10,14 +10,14 @@ class BadKeyword(Exception):
 
 class NotDeclared(Exception):
     def __init__(self, word,  lnumber=None, message="Error"):
-        lnumber = f'(linia {lnumber})' if lnumber else ''
-        self.message = ("Błąd %s: Zmienna nie zadeklarowana: %s" % (lnumber, word))
+        lnumber = f' (linia {lnumber})' if lnumber else ''
+        self.message = ("Błąd%s: Zmienna nie zadeklarowana: %s" % (lnumber, word))
         super().__init__(self.message)
 
 class AlreadyDeclared(Exception):
     def __init__(self,  name, lnumber=None, message="Error"):
-        lnumber = f'(linia {lnumber})' if lnumber else ''
-        self.message = ("Błąd %s: Zmienna uprzednio zadeklarowana: %s" % (lnumber, name))
+        lnumber = f' (linia {lnumber})' if lnumber else ''
+        self.message = ("Błąd%s: Zmienna uprzednio zadeklarowana: %s" % (lnumber, name))
         super().__init__(self.message)
 
 class NotAnArray(Exception):
@@ -37,8 +37,8 @@ class IteratorModification(Exception):
 
 class NotInitialized(Exception):
     def __init__(self, name, lnumber=None, message="Error"):
-        lnumber = f'(linia {lnumber})' if lnumber else ''
-        self.message = ("Błąd %s: zmienna nie zainicjalizowana: %s" % (lnumber, name))
+        lnumber = f' (linia {lnumber})' if lnumber else ''
+        self.message = ("Błąd%s: zmienna nie zainicjalizowana: %s" % (lnumber, name))
         super().__init__(self.message)
 
 class ReusedIterator(Exception):
