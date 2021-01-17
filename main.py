@@ -321,10 +321,10 @@ def p_declarations_array(p):
 		 	            | declarations COMMA PID LBRACKET NUM COLON NUM RBRACKET '''
     ind = 1 if len(p) == 7 else 3
     if p[ind + 2] > p[ind + 4]:
-        raise InvalidArrayRange(p.lexer.lineno, p[ind + 2], p[ind + 4])
+        raise InvalidArrayRange(p.lineno(ind), p[ind + 2], p[ind + 4])
     p[0] = p[ind] if p[ind] not in declared else False
     if not p[0]:
-        raise AlreadyDeclared(p[ind], p.lexer.lineno)
+        raise AlreadyDeclared(p[ind], p.lineno(ind))
     declared.append(p[ind])
     arrays[p[ind]] = (p[ind + 2], p[ind + 4])
 
@@ -334,7 +334,7 @@ def p_declarations_pid(p):
     ind = 1 if len(p) == 2 else 3
     p[0] = p[ind] if p[ind] not in declared else False
     if not p[0]:
-        raise AlreadyDeclared(p[ind], p.lexer.lineno)
+        raise AlreadyDeclared(p[ind], p.lineno(ind))
     declared.append(p[ind])
 
 def p_commands(p):
@@ -370,9 +370,9 @@ def check_variable(var, lineno):
 def p_command_assign(p):
     ''' command	: identifier ASSIGN expression SEMICOLON '''
     if isinstance(p[3], str) or (isinstance(p[3],tuple) and (p[3][0] == 'tab' or p[3][0] == 'tabi')):
-        check_variable(p[3], p.lexer.lineno)
+        check_variable(p[3], p.lineno(2))
     if p[1] not in iterators:
-        init_val(p[1], p.lexer.lineno)
+        init_val(p[1], p.lineno(1))
     p[0] = ("assign", p[1], p[3])
 
 def p_command_if(p):
@@ -392,25 +392,25 @@ def p_iterator(p):
     ''' iterator	: PID '''
     p[0] = p[1]
     if p[1] in memory:
-        raise AlreadyDeclared(p[1], p.lexer.lineno)
+        raise AlreadyDeclared(p[1], p.lineno(1))
     iterators.append(p[1])
 
 def p_command_for(p):
     ''' command	: FOR iterator FROM value TO value DO commands ENDFOR
             | FOR iterator FROM value DOWNTO value DO commands ENDFOR '''
     if p[2] in declared:
-        raise AlreadyDeclared(p[2], p.lexer.lineno)
-    check_variable(p[4], p.lexer.lineno)
-    check_variable(p[6], p.lexer.lineno)
+        raise AlreadyDeclared(p[2], p.lineno(2))
+    check_variable(p[4], p.lineno(1))
+    check_variable(p[6], p.lineno(1))
     p[0] = ("for", p[2], p[4], p[6], p[8]) if p[5] == 'TO' else ("downfor", p[2], p[4], p[6], p[8])
 
 def p_command_io(p):
     ''' command	: READ identifier SEMICOLON
             | WRITE value SEMICOLON '''
     if p[1] == 'READ' and p[2] not in iterators:
-        init_val(p[2], p.lexer.lineno)
+        init_val(p[2], p.lineno(2))
     elif p[1] == 'WRITE':
-        check_variable(p[2], p.lexer.lineno)
+        check_variable(p[2], p.lineno(1))
     p[0] = ("read", p[2]) if p[1] == 'READ' else ("write", p[2])
 
 def p_expression_value(p):
@@ -423,8 +423,8 @@ def p_operation(p):
                   | value MUL value
                   | value DIV value
                   | value MOD value'''
-    check_variable(p[1], p.lexer.lineno)
-    check_variable(p[3], p.lexer.lineno)
+    check_variable(p[1], p.lineno(1))
+    check_variable(p[3], p.lineno(3))
     p[0] = (p[2], p[1], p[3])
 
 def p_condition(p):
@@ -434,8 +434,8 @@ def p_condition(p):
                   | value GREATER value
                   | value LOWEREQUAL value
                   | value GREATEREQUAL value'''
-    check_variable(p[1], p.lexer.lineno)
-    check_variable(p[3], p.lexer.lineno)
+    check_variable(p[1], p.lineno(1))
+    check_variable(p[3], p.lineno(3))
     p[0] = (p[2], p[1], p[3])
 
 def p_value_NUM(p):
@@ -449,20 +449,20 @@ def p_value_identifier(p):
 def p_identifier_pid(p):
     '''identifier	: PID '''
     if p[1] not in declared and p[1] not in iterators:
-        raise NotDeclared(p[1], p.lexer.lineno)
+        raise NotDeclared(p[1], p.lineno(1))
     if p[1] in arrays:
-        raise NotAVariable(p.lexer.lineno, p[1])
+        raise NotAVariable(p.lineno(1), p[1])
     p[0] = (p[1])
 
 def p_identifier_tab_id(p):
     '''identifier	: PID LBRACKET PID RBRACKET
                     | PID LBRACKET NUM RBRACKET '''
     if p[1] not in declared:
-        raise NotDeclared(p[1], p.lexer.lineno)
+        raise NotDeclared(p[1], p.lineno(1))
     if p[1] not in arrays:
-        raise NotAnArray(p.lexer.lineno, p[1])
+        raise NotAnArray(p.lineno(1), p[1])
     if isinstance(p[3], int) and (p[3] < arrays[p[1]][0] or p[3] > arrays[p[1]][1]):
-        raise InvalidArrayElement(p.lexer.lineno, p[3], p[1])
+        raise InvalidArrayElement(p.lineno(1), p[3], p[1])
 
     p[0] = ("tab", p[1], (p[3])) if isinstance(p[3], int) else ("tabi", p[1], (p[3]))
 
@@ -471,6 +471,8 @@ def p_error(p):
         raise InvalidCharacter(str(p.lineno), str(p.value))
     sys.exit("Błąd składni")
 
+def get_line_number():
+    pass
 
 def evaluate(ex, bid=0, justassign=False):
     if 'i' in memory and memory['i'] == 106:

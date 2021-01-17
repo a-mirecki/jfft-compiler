@@ -1617,3 +1617,1527 @@ state 99
     ENDWHILE        reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
     ENDFOR          reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
 
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . DECLARE declarations BEGIN commands END
+    (2) program -> . BEGIN commands END
+
+    DECLARE         shift and go to state 2
+    BEGIN           shift and go to state 3
+
+    program                        shift and go to state 1
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> DECLARE . declarations BEGIN commands END
+    (3) declarations -> . PID LBRACKET NUM COLON NUM RBRACKET
+    (4) declarations -> . declarations COMMA PID LBRACKET NUM COLON NUM RBRACKET
+    (5) declarations -> . PID
+    (6) declarations -> . declarations COMMA PID
+
+    PID             shift and go to state 5
+
+    declarations                   shift and go to state 4
+
+state 3
+
+    (2) program -> BEGIN . commands END
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 6
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 4
+
+    (1) program -> DECLARE declarations . BEGIN commands END
+    (4) declarations -> declarations . COMMA PID LBRACKET NUM COLON NUM RBRACKET
+    (6) declarations -> declarations . COMMA PID
+
+    BEGIN           shift and go to state 16
+    COMMA           shift and go to state 17
+
+
+state 5
+
+    (3) declarations -> PID . LBRACKET NUM COLON NUM RBRACKET
+    (5) declarations -> PID .
+
+    LBRACKET        shift and go to state 18
+    BEGIN           reduce using rule 5 (declarations -> PID .)
+    COMMA           reduce using rule 5 (declarations -> PID .)
+
+
+state 6
+
+    (2) program -> BEGIN commands . END
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    END             shift and go to state 19
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 7
+
+    (7) commands -> command .
+
+    END             reduce using rule 7 (commands -> command .)
+    IF              reduce using rule 7 (commands -> command .)
+    WHILE           reduce using rule 7 (commands -> command .)
+    REPEAT          reduce using rule 7 (commands -> command .)
+    FOR             reduce using rule 7 (commands -> command .)
+    READ            reduce using rule 7 (commands -> command .)
+    WRITE           reduce using rule 7 (commands -> command .)
+    PID             reduce using rule 7 (commands -> command .)
+    UNTIL           reduce using rule 7 (commands -> command .)
+    ENDIF           reduce using rule 7 (commands -> command .)
+    ELSE            reduce using rule 7 (commands -> command .)
+    ENDWHILE        reduce using rule 7 (commands -> command .)
+    ENDFOR          reduce using rule 7 (commands -> command .)
+
+
+state 8
+
+    (9) command -> identifier . ASSIGN expression SEMICOLON
+
+    ASSIGN          shift and go to state 21
+
+
+state 9
+
+    (10) command -> IF . condition THEN commands ENDIF
+    (11) command -> IF . condition THEN commands ELSE commands ENDIF
+    (25) condition -> . value EQUAL value
+    (26) condition -> . value NOTEQUAL value
+    (27) condition -> . value LOWER value
+    (28) condition -> . value GREATER value
+    (29) condition -> . value LOWEREQUAL value
+    (30) condition -> . value GREATEREQUAL value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    condition                      shift and go to state 22
+    value                          shift and go to state 23
+    identifier                     shift and go to state 25
+
+state 10
+
+    (12) command -> WHILE . condition DO commands ENDWHILE
+    (25) condition -> . value EQUAL value
+    (26) condition -> . value NOTEQUAL value
+    (27) condition -> . value LOWER value
+    (28) condition -> . value GREATER value
+    (29) condition -> . value LOWEREQUAL value
+    (30) condition -> . value GREATEREQUAL value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    condition                      shift and go to state 26
+    value                          shift and go to state 23
+    identifier                     shift and go to state 25
+
+state 11
+
+    (13) command -> REPEAT . commands UNTIL condition SEMICOLON
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 27
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 12
+
+    (15) command -> FOR . iterator FROM value TO value DO commands ENDFOR
+    (16) command -> FOR . iterator FROM value DOWNTO value DO commands ENDFOR
+    (14) iterator -> . PID
+
+    PID             shift and go to state 29
+
+    iterator                       shift and go to state 28
+
+state 13
+
+    (17) command -> READ . identifier SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    PID             shift and go to state 15
+
+    identifier                     shift and go to state 30
+
+state 14
+
+    (18) command -> WRITE . value SEMICOLON
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 31
+    identifier                     shift and go to state 25
+
+state 15
+
+    (33) identifier -> PID .
+    (34) identifier -> PID . LBRACKET PID RBRACKET
+    (35) identifier -> PID . LBRACKET NUM RBRACKET
+
+    ASSIGN          reduce using rule 33 (identifier -> PID .)
+    EQUAL           reduce using rule 33 (identifier -> PID .)
+    NOTEQUAL        reduce using rule 33 (identifier -> PID .)
+    LOWER           reduce using rule 33 (identifier -> PID .)
+    GREATER         reduce using rule 33 (identifier -> PID .)
+    LOWEREQUAL      reduce using rule 33 (identifier -> PID .)
+    GREATEREQUAL    reduce using rule 33 (identifier -> PID .)
+    SEMICOLON       reduce using rule 33 (identifier -> PID .)
+    ADD             reduce using rule 33 (identifier -> PID .)
+    SUB             reduce using rule 33 (identifier -> PID .)
+    MUL             reduce using rule 33 (identifier -> PID .)
+    DIV             reduce using rule 33 (identifier -> PID .)
+    MOD             reduce using rule 33 (identifier -> PID .)
+    THEN            reduce using rule 33 (identifier -> PID .)
+    DO              reduce using rule 33 (identifier -> PID .)
+    TO              reduce using rule 33 (identifier -> PID .)
+    DOWNTO          reduce using rule 33 (identifier -> PID .)
+    LBRACKET        shift and go to state 32
+
+
+state 16
+
+    (1) program -> DECLARE declarations BEGIN . commands END
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 33
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 17
+
+    (4) declarations -> declarations COMMA . PID LBRACKET NUM COLON NUM RBRACKET
+    (6) declarations -> declarations COMMA . PID
+
+    PID             shift and go to state 34
+
+
+state 18
+
+    (3) declarations -> PID LBRACKET . NUM COLON NUM RBRACKET
+
+    NUM             shift and go to state 35
+
+
+state 19
+
+    (2) program -> BEGIN commands END .
+
+    $end            reduce using rule 2 (program -> BEGIN commands END .)
+
+
+state 20
+
+    (8) commands -> commands command .
+
+    END             reduce using rule 8 (commands -> commands command .)
+    IF              reduce using rule 8 (commands -> commands command .)
+    WHILE           reduce using rule 8 (commands -> commands command .)
+    REPEAT          reduce using rule 8 (commands -> commands command .)
+    FOR             reduce using rule 8 (commands -> commands command .)
+    READ            reduce using rule 8 (commands -> commands command .)
+    WRITE           reduce using rule 8 (commands -> commands command .)
+    PID             reduce using rule 8 (commands -> commands command .)
+    UNTIL           reduce using rule 8 (commands -> commands command .)
+    ENDIF           reduce using rule 8 (commands -> commands command .)
+    ELSE            reduce using rule 8 (commands -> commands command .)
+    ENDWHILE        reduce using rule 8 (commands -> commands command .)
+    ENDFOR          reduce using rule 8 (commands -> commands command .)
+
+
+state 21
+
+    (9) command -> identifier ASSIGN . expression SEMICOLON
+    (19) expression -> . value
+    (20) expression -> . value ADD value
+    (21) expression -> . value SUB value
+    (22) expression -> . value MUL value
+    (23) expression -> . value DIV value
+    (24) expression -> . value MOD value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    identifier                     shift and go to state 25
+    expression                     shift and go to state 36
+    value                          shift and go to state 37
+
+state 22
+
+    (10) command -> IF condition . THEN commands ENDIF
+    (11) command -> IF condition . THEN commands ELSE commands ENDIF
+
+    THEN            shift and go to state 38
+
+
+state 23
+
+    (25) condition -> value . EQUAL value
+    (26) condition -> value . NOTEQUAL value
+    (27) condition -> value . LOWER value
+    (28) condition -> value . GREATER value
+    (29) condition -> value . LOWEREQUAL value
+    (30) condition -> value . GREATEREQUAL value
+
+    EQUAL           shift and go to state 39
+    NOTEQUAL        shift and go to state 40
+    LOWER           shift and go to state 41
+    GREATER         shift and go to state 42
+    LOWEREQUAL      shift and go to state 43
+    GREATEREQUAL    shift and go to state 44
+
+
+state 24
+
+    (31) value -> NUM .
+
+    EQUAL           reduce using rule 31 (value -> NUM .)
+    NOTEQUAL        reduce using rule 31 (value -> NUM .)
+    LOWER           reduce using rule 31 (value -> NUM .)
+    GREATER         reduce using rule 31 (value -> NUM .)
+    LOWEREQUAL      reduce using rule 31 (value -> NUM .)
+    GREATEREQUAL    reduce using rule 31 (value -> NUM .)
+    SEMICOLON       reduce using rule 31 (value -> NUM .)
+    ADD             reduce using rule 31 (value -> NUM .)
+    SUB             reduce using rule 31 (value -> NUM .)
+    MUL             reduce using rule 31 (value -> NUM .)
+    DIV             reduce using rule 31 (value -> NUM .)
+    MOD             reduce using rule 31 (value -> NUM .)
+    THEN            reduce using rule 31 (value -> NUM .)
+    DO              reduce using rule 31 (value -> NUM .)
+    TO              reduce using rule 31 (value -> NUM .)
+    DOWNTO          reduce using rule 31 (value -> NUM .)
+
+
+state 25
+
+    (32) value -> identifier .
+
+    EQUAL           reduce using rule 32 (value -> identifier .)
+    NOTEQUAL        reduce using rule 32 (value -> identifier .)
+    LOWER           reduce using rule 32 (value -> identifier .)
+    GREATER         reduce using rule 32 (value -> identifier .)
+    LOWEREQUAL      reduce using rule 32 (value -> identifier .)
+    GREATEREQUAL    reduce using rule 32 (value -> identifier .)
+    SEMICOLON       reduce using rule 32 (value -> identifier .)
+    ADD             reduce using rule 32 (value -> identifier .)
+    SUB             reduce using rule 32 (value -> identifier .)
+    MUL             reduce using rule 32 (value -> identifier .)
+    DIV             reduce using rule 32 (value -> identifier .)
+    MOD             reduce using rule 32 (value -> identifier .)
+    THEN            reduce using rule 32 (value -> identifier .)
+    DO              reduce using rule 32 (value -> identifier .)
+    TO              reduce using rule 32 (value -> identifier .)
+    DOWNTO          reduce using rule 32 (value -> identifier .)
+
+
+state 26
+
+    (12) command -> WHILE condition . DO commands ENDWHILE
+
+    DO              shift and go to state 45
+
+
+state 27
+
+    (13) command -> REPEAT commands . UNTIL condition SEMICOLON
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    UNTIL           shift and go to state 46
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 28
+
+    (15) command -> FOR iterator . FROM value TO value DO commands ENDFOR
+    (16) command -> FOR iterator . FROM value DOWNTO value DO commands ENDFOR
+
+    FROM            shift and go to state 47
+
+
+state 29
+
+    (14) iterator -> PID .
+
+    FROM            reduce using rule 14 (iterator -> PID .)
+
+
+state 30
+
+    (17) command -> READ identifier . SEMICOLON
+
+    SEMICOLON       shift and go to state 48
+
+
+state 31
+
+    (18) command -> WRITE value . SEMICOLON
+
+    SEMICOLON       shift and go to state 49
+
+
+state 32
+
+    (34) identifier -> PID LBRACKET . PID RBRACKET
+    (35) identifier -> PID LBRACKET . NUM RBRACKET
+
+    PID             shift and go to state 50
+    NUM             shift and go to state 51
+
+
+state 33
+
+    (1) program -> DECLARE declarations BEGIN commands . END
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    END             shift and go to state 52
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 34
+
+    (4) declarations -> declarations COMMA PID . LBRACKET NUM COLON NUM RBRACKET
+    (6) declarations -> declarations COMMA PID .
+
+    LBRACKET        shift and go to state 53
+    BEGIN           reduce using rule 6 (declarations -> declarations COMMA PID .)
+    COMMA           reduce using rule 6 (declarations -> declarations COMMA PID .)
+
+
+state 35
+
+    (3) declarations -> PID LBRACKET NUM . COLON NUM RBRACKET
+
+    COLON           shift and go to state 54
+
+
+state 36
+
+    (9) command -> identifier ASSIGN expression . SEMICOLON
+
+    SEMICOLON       shift and go to state 55
+
+
+state 37
+
+    (19) expression -> value .
+    (20) expression -> value . ADD value
+    (21) expression -> value . SUB value
+    (22) expression -> value . MUL value
+    (23) expression -> value . DIV value
+    (24) expression -> value . MOD value
+
+    SEMICOLON       reduce using rule 19 (expression -> value .)
+    ADD             shift and go to state 56
+    SUB             shift and go to state 57
+    MUL             shift and go to state 58
+    DIV             shift and go to state 59
+    MOD             shift and go to state 60
+
+
+state 38
+
+    (10) command -> IF condition THEN . commands ENDIF
+    (11) command -> IF condition THEN . commands ELSE commands ENDIF
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 61
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 39
+
+    (25) condition -> value EQUAL . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 62
+    identifier                     shift and go to state 25
+
+state 40
+
+    (26) condition -> value NOTEQUAL . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 63
+    identifier                     shift and go to state 25
+
+state 41
+
+    (27) condition -> value LOWER . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 64
+    identifier                     shift and go to state 25
+
+state 42
+
+    (28) condition -> value GREATER . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 65
+    identifier                     shift and go to state 25
+
+state 43
+
+    (29) condition -> value LOWEREQUAL . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 66
+    identifier                     shift and go to state 25
+
+state 44
+
+    (30) condition -> value GREATEREQUAL . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 67
+    identifier                     shift and go to state 25
+
+state 45
+
+    (12) command -> WHILE condition DO . commands ENDWHILE
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 68
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 46
+
+    (13) command -> REPEAT commands UNTIL . condition SEMICOLON
+    (25) condition -> . value EQUAL value
+    (26) condition -> . value NOTEQUAL value
+    (27) condition -> . value LOWER value
+    (28) condition -> . value GREATER value
+    (29) condition -> . value LOWEREQUAL value
+    (30) condition -> . value GREATEREQUAL value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    condition                      shift and go to state 69
+    value                          shift and go to state 23
+    identifier                     shift and go to state 25
+
+state 47
+
+    (15) command -> FOR iterator FROM . value TO value DO commands ENDFOR
+    (16) command -> FOR iterator FROM . value DOWNTO value DO commands ENDFOR
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 70
+    identifier                     shift and go to state 25
+
+state 48
+
+    (17) command -> READ identifier SEMICOLON .
+
+    END             reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    IF              reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    WHILE           reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    REPEAT          reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    FOR             reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    READ            reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    WRITE           reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    PID             reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    UNTIL           reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    ENDIF           reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    ELSE            reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    ENDWHILE        reduce using rule 17 (command -> READ identifier SEMICOLON .)
+    ENDFOR          reduce using rule 17 (command -> READ identifier SEMICOLON .)
+
+
+state 49
+
+    (18) command -> WRITE value SEMICOLON .
+
+    END             reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    IF              reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    WHILE           reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    REPEAT          reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    FOR             reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    READ            reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    WRITE           reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    PID             reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    UNTIL           reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    ENDIF           reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    ELSE            reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    ENDWHILE        reduce using rule 18 (command -> WRITE value SEMICOLON .)
+    ENDFOR          reduce using rule 18 (command -> WRITE value SEMICOLON .)
+
+
+state 50
+
+    (34) identifier -> PID LBRACKET PID . RBRACKET
+
+    RBRACKET        shift and go to state 71
+
+
+state 51
+
+    (35) identifier -> PID LBRACKET NUM . RBRACKET
+
+    RBRACKET        shift and go to state 72
+
+
+state 52
+
+    (1) program -> DECLARE declarations BEGIN commands END .
+
+    $end            reduce using rule 1 (program -> DECLARE declarations BEGIN commands END .)
+
+
+state 53
+
+    (4) declarations -> declarations COMMA PID LBRACKET . NUM COLON NUM RBRACKET
+
+    NUM             shift and go to state 73
+
+
+state 54
+
+    (3) declarations -> PID LBRACKET NUM COLON . NUM RBRACKET
+
+    NUM             shift and go to state 74
+
+
+state 55
+
+    (9) command -> identifier ASSIGN expression SEMICOLON .
+
+    END             reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    IF              reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    WHILE           reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    REPEAT          reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    FOR             reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    READ            reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    WRITE           reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    PID             reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    UNTIL           reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    ENDIF           reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    ELSE            reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    ENDWHILE        reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+    ENDFOR          reduce using rule 9 (command -> identifier ASSIGN expression SEMICOLON .)
+
+
+state 56
+
+    (20) expression -> value ADD . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 75
+    identifier                     shift and go to state 25
+
+state 57
+
+    (21) expression -> value SUB . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 76
+    identifier                     shift and go to state 25
+
+state 58
+
+    (22) expression -> value MUL . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 77
+    identifier                     shift and go to state 25
+
+state 59
+
+    (23) expression -> value DIV . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 78
+    identifier                     shift and go to state 25
+
+state 60
+
+    (24) expression -> value MOD . value
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 79
+    identifier                     shift and go to state 25
+
+state 61
+
+    (10) command -> IF condition THEN commands . ENDIF
+    (11) command -> IF condition THEN commands . ELSE commands ENDIF
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    ENDIF           shift and go to state 80
+    ELSE            shift and go to state 81
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 62
+
+    (25) condition -> value EQUAL value .
+
+    THEN            reduce using rule 25 (condition -> value EQUAL value .)
+    DO              reduce using rule 25 (condition -> value EQUAL value .)
+    SEMICOLON       reduce using rule 25 (condition -> value EQUAL value .)
+
+
+state 63
+
+    (26) condition -> value NOTEQUAL value .
+
+    THEN            reduce using rule 26 (condition -> value NOTEQUAL value .)
+    DO              reduce using rule 26 (condition -> value NOTEQUAL value .)
+    SEMICOLON       reduce using rule 26 (condition -> value NOTEQUAL value .)
+
+
+state 64
+
+    (27) condition -> value LOWER value .
+
+    THEN            reduce using rule 27 (condition -> value LOWER value .)
+    DO              reduce using rule 27 (condition -> value LOWER value .)
+    SEMICOLON       reduce using rule 27 (condition -> value LOWER value .)
+
+
+state 65
+
+    (28) condition -> value GREATER value .
+
+    THEN            reduce using rule 28 (condition -> value GREATER value .)
+    DO              reduce using rule 28 (condition -> value GREATER value .)
+    SEMICOLON       reduce using rule 28 (condition -> value GREATER value .)
+
+
+state 66
+
+    (29) condition -> value LOWEREQUAL value .
+
+    THEN            reduce using rule 29 (condition -> value LOWEREQUAL value .)
+    DO              reduce using rule 29 (condition -> value LOWEREQUAL value .)
+    SEMICOLON       reduce using rule 29 (condition -> value LOWEREQUAL value .)
+
+
+state 67
+
+    (30) condition -> value GREATEREQUAL value .
+
+    THEN            reduce using rule 30 (condition -> value GREATEREQUAL value .)
+    DO              reduce using rule 30 (condition -> value GREATEREQUAL value .)
+    SEMICOLON       reduce using rule 30 (condition -> value GREATEREQUAL value .)
+
+
+state 68
+
+    (12) command -> WHILE condition DO commands . ENDWHILE
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    ENDWHILE        shift and go to state 82
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 69
+
+    (13) command -> REPEAT commands UNTIL condition . SEMICOLON
+
+    SEMICOLON       shift and go to state 83
+
+
+state 70
+
+    (15) command -> FOR iterator FROM value . TO value DO commands ENDFOR
+    (16) command -> FOR iterator FROM value . DOWNTO value DO commands ENDFOR
+
+    TO              shift and go to state 84
+    DOWNTO          shift and go to state 85
+
+
+state 71
+
+    (34) identifier -> PID LBRACKET PID RBRACKET .
+
+    ASSIGN          reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    EQUAL           reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    NOTEQUAL        reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    LOWER           reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    GREATER         reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    LOWEREQUAL      reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    GREATEREQUAL    reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    SEMICOLON       reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    ADD             reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    SUB             reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    MUL             reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    DIV             reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    MOD             reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    THEN            reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    DO              reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    TO              reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+    DOWNTO          reduce using rule 34 (identifier -> PID LBRACKET PID RBRACKET .)
+
+
+state 72
+
+    (35) identifier -> PID LBRACKET NUM RBRACKET .
+
+    ASSIGN          reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    EQUAL           reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    NOTEQUAL        reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    LOWER           reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    GREATER         reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    LOWEREQUAL      reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    GREATEREQUAL    reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    SEMICOLON       reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    ADD             reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    SUB             reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    MUL             reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    DIV             reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    MOD             reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    THEN            reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    DO              reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    TO              reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+    DOWNTO          reduce using rule 35 (identifier -> PID LBRACKET NUM RBRACKET .)
+
+
+state 73
+
+    (4) declarations -> declarations COMMA PID LBRACKET NUM . COLON NUM RBRACKET
+
+    COLON           shift and go to state 86
+
+
+state 74
+
+    (3) declarations -> PID LBRACKET NUM COLON NUM . RBRACKET
+
+    RBRACKET        shift and go to state 87
+
+
+state 75
+
+    (20) expression -> value ADD value .
+
+    SEMICOLON       reduce using rule 20 (expression -> value ADD value .)
+
+
+state 76
+
+    (21) expression -> value SUB value .
+
+    SEMICOLON       reduce using rule 21 (expression -> value SUB value .)
+
+
+state 77
+
+    (22) expression -> value MUL value .
+
+    SEMICOLON       reduce using rule 22 (expression -> value MUL value .)
+
+
+state 78
+
+    (23) expression -> value DIV value .
+
+    SEMICOLON       reduce using rule 23 (expression -> value DIV value .)
+
+
+state 79
+
+    (24) expression -> value MOD value .
+
+    SEMICOLON       reduce using rule 24 (expression -> value MOD value .)
+
+
+state 80
+
+    (10) command -> IF condition THEN commands ENDIF .
+
+    END             reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    IF              reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    WHILE           reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    REPEAT          reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    FOR             reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    READ            reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    WRITE           reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    PID             reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    UNTIL           reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    ENDIF           reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    ELSE            reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    ENDWHILE        reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+    ENDFOR          reduce using rule 10 (command -> IF condition THEN commands ENDIF .)
+
+
+state 81
+
+    (11) command -> IF condition THEN commands ELSE . commands ENDIF
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 88
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 82
+
+    (12) command -> WHILE condition DO commands ENDWHILE .
+
+    END             reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    IF              reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    WHILE           reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    REPEAT          reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    FOR             reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    READ            reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    WRITE           reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    PID             reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    UNTIL           reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    ENDIF           reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    ELSE            reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    ENDWHILE        reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+    ENDFOR          reduce using rule 12 (command -> WHILE condition DO commands ENDWHILE .)
+
+
+state 83
+
+    (13) command -> REPEAT commands UNTIL condition SEMICOLON .
+
+    END             reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    IF              reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    WHILE           reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    REPEAT          reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    FOR             reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    READ            reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    WRITE           reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    PID             reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    UNTIL           reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ENDIF           reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ELSE            reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ENDWHILE        reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ENDFOR          reduce using rule 13 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+
+
+state 84
+
+    (15) command -> FOR iterator FROM value TO . value DO commands ENDFOR
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 89
+    identifier                     shift and go to state 25
+
+state 85
+
+    (16) command -> FOR iterator FROM value DOWNTO . value DO commands ENDFOR
+    (31) value -> . NUM
+    (32) value -> . identifier
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    NUM             shift and go to state 24
+    PID             shift and go to state 15
+
+    value                          shift and go to state 90
+    identifier                     shift and go to state 25
+
+state 86
+
+    (4) declarations -> declarations COMMA PID LBRACKET NUM COLON . NUM RBRACKET
+
+    NUM             shift and go to state 91
+
+
+state 87
+
+    (3) declarations -> PID LBRACKET NUM COLON NUM RBRACKET .
+
+    BEGIN           reduce using rule 3 (declarations -> PID LBRACKET NUM COLON NUM RBRACKET .)
+    COMMA           reduce using rule 3 (declarations -> PID LBRACKET NUM COLON NUM RBRACKET .)
+
+
+state 88
+
+    (11) command -> IF condition THEN commands ELSE commands . ENDIF
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    ENDIF           shift and go to state 92
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 89
+
+    (15) command -> FOR iterator FROM value TO value . DO commands ENDFOR
+
+    DO              shift and go to state 93
+
+
+state 90
+
+    (16) command -> FOR iterator FROM value DOWNTO value . DO commands ENDFOR
+
+    DO              shift and go to state 94
+
+
+state 91
+
+    (4) declarations -> declarations COMMA PID LBRACKET NUM COLON NUM . RBRACKET
+
+    RBRACKET        shift and go to state 95
+
+
+state 92
+
+    (11) command -> IF condition THEN commands ELSE commands ENDIF .
+
+    END             reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    IF              reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    WHILE           reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    REPEAT          reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    FOR             reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    READ            reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    WRITE           reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    PID             reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    UNTIL           reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    ENDIF           reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    ELSE            reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    ENDWHILE        reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+    ENDFOR          reduce using rule 11 (command -> IF condition THEN commands ELSE commands ENDIF .)
+
+
+state 93
+
+    (15) command -> FOR iterator FROM value TO value DO . commands ENDFOR
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 96
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 94
+
+    (16) command -> FOR iterator FROM value DOWNTO value DO . commands ENDFOR
+    (7) commands -> . command
+    (8) commands -> . commands command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    commands                       shift and go to state 97
+    command                        shift and go to state 7
+    identifier                     shift and go to state 8
+
+state 95
+
+    (4) declarations -> declarations COMMA PID LBRACKET NUM COLON NUM RBRACKET .
+
+    BEGIN           reduce using rule 4 (declarations -> declarations COMMA PID LBRACKET NUM COLON NUM RBRACKET .)
+    COMMA           reduce using rule 4 (declarations -> declarations COMMA PID LBRACKET NUM COLON NUM RBRACKET .)
+
+
+state 96
+
+    (15) command -> FOR iterator FROM value TO value DO commands . ENDFOR
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    ENDFOR          shift and go to state 98
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 97
+
+    (16) command -> FOR iterator FROM value DOWNTO value DO commands . ENDFOR
+    (8) commands -> commands . command
+    (9) command -> . identifier ASSIGN expression SEMICOLON
+    (10) command -> . IF condition THEN commands ENDIF
+    (11) command -> . IF condition THEN commands ELSE commands ENDIF
+    (12) command -> . WHILE condition DO commands ENDWHILE
+    (13) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (15) command -> . FOR iterator FROM value TO value DO commands ENDFOR
+    (16) command -> . FOR iterator FROM value DOWNTO value DO commands ENDFOR
+    (17) command -> . READ identifier SEMICOLON
+    (18) command -> . WRITE value SEMICOLON
+    (33) identifier -> . PID
+    (34) identifier -> . PID LBRACKET PID RBRACKET
+    (35) identifier -> . PID LBRACKET NUM RBRACKET
+
+    ENDFOR          shift and go to state 99
+    IF              shift and go to state 9
+    WHILE           shift and go to state 10
+    REPEAT          shift and go to state 11
+    FOR             shift and go to state 12
+    READ            shift and go to state 13
+    WRITE           shift and go to state 14
+    PID             shift and go to state 15
+
+    command                        shift and go to state 20
+    identifier                     shift and go to state 8
+
+state 98
+
+    (15) command -> FOR iterator FROM value TO value DO commands ENDFOR .
+
+    END             reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    IF              reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    WHILE           reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    REPEAT          reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    FOR             reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    READ            reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    WRITE           reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    PID             reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    UNTIL           reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    ENDIF           reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    ELSE            reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    ENDWHILE        reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+    ENDFOR          reduce using rule 15 (command -> FOR iterator FROM value TO value DO commands ENDFOR .)
+
+
+state 99
+
+    (16) command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .
+
+    END             reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    IF              reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    WHILE           reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    REPEAT          reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    FOR             reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    READ            reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    WRITE           reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    PID             reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    UNTIL           reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    ENDIF           reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    ELSE            reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    ENDWHILE        reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+    ENDFOR          reduce using rule 16 (command -> FOR iterator FROM value DOWNTO value DO commands ENDFOR .)
+

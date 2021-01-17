@@ -1,9 +1,28 @@
-[ Błąd w linii 8: niezadeklarowana zmienna i ]
+[ Rozklad liczby na czynniki pierwsze ]
 DECLARE
-  a, b(10:10)
+    n, m, reszta, potega, dzielnik
 BEGIN
-  FOR i FROM 0 TO 9 DO
-    b(i) := i * i;
-  ENDFOR
-  a := b(i);
+    READ n;
+    dzielnik := 2;
+    m := dzielnik * dzielnik;
+    WHILE n >= m DO
+        potega := 0;
+        reszta := n % dzielnik;
+        WHILE reszta = 0 DO
+            n := n / dzielnik;
+            potega := potega + 1;
+            reszta := n % dzielnik;
+        ENDWHILE
+        IF potega > 0 THEN [ czy znaleziono dzielnik ]
+            WRITE dzielnik;
+            WRITE potega;
+        ELSE
+            dzielnik := dzielnik + 1;
+            m := dzielnik * dzielnik;
+        ENDIF
+    ENDWHILE
+    IF n != 1 THEN [ ostatni dzielnik ]
+        WRITE n;
+        WRITE 1;
+    ENDIF
 END
