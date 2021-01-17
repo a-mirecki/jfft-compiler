@@ -3,6 +3,7 @@ import math
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
+import traceback
 from exceptions import *
 import argparse
 
@@ -10,7 +11,6 @@ import argparse
 memoryInd, bufferId = 0, 0
 instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer, = [], [], [], [], [], [], {}, {}, {}, {}
 rtol = ["a", "b", "c", "d", "e", "f"]
-
 
 def clear_ins_buffer(*args):
     for arg in args:
@@ -228,10 +228,8 @@ def sub(a, b, bid):
 def mul(a, b, bid):
     if a == 0 or b == 0:
         return set_register(1, 0, bid)
-    if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4, loadA=(a != 0
-                                                                                                           and a != 1 and not (
-                    isinstance(a, int) and a & (a - 1) == 0)),
-                          loadB=(b != 0 and b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
+    if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4, loadA=(a != 0 and a != 1 and not (
+    isinstance(a, int) and a & (a - 1) == 0)), loadB=(b != 0 and b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
         if b == 1 or a == 1:
             add_commands(["RESET b", "ADD b %s" % ("e" if b == 1 else "c")], bid)
         elif isinstance(b, int) and b & (b - 1) == 0 or isinstance(a, int) and a & (a - 1) == 0:
@@ -249,9 +247,8 @@ def div(a, b, bid, modulo=False):
         return set_register(1, 0, bid)
     c = a % b if modulo and isinstance(a, int) and isinstance(b, int) else (
         a // b if isinstance(a, int) and isinstance(b, int) else -1)
-    if evaluate_operation(a, b, c, bid,
-                          loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0)) or modulo) and (
-                                  b != 1 or modulo)):
+    if evaluate_operation(a, b, c, bid, loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))
+                                               or modulo) and (b != 1 or modulo)):
         if isinstance(b, int) and b & (b - 1) == 0 and not modulo:
             power = int(math.log2(b))
             add_commands(["SHR b"] * power, bid)
@@ -521,6 +518,23 @@ def evaluate(ex, bid=0, justassign=False):
         if isinstance(ex, str) and ex not in initialized and not justassign:
             raise NotInitialized(ex)
         return ex
+
+def compi(infi, save=False):
+    global memoryInd, bufferId, instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer
+    memoryInd, bufferId = 0, 0
+    instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer = [], [], [], [], [], [], {}, {}, {}, {}
+    with open(infi, 'r') as fp:
+        content = fp.read()
+        try:
+            parser.parse(content)
+            if save:
+                f = open("out.mr", 'w')
+                f.write('\n'.join(instructions))
+                f.close()
+            else:
+                print('\n'.join(instructions))
+        except Exception as e:
+            print(traceback.format_exc())
 
 parser = yacc.yacc()
 
