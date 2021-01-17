@@ -48,5 +48,5 @@ class InvalidArrayElement(Exception):
 
 class InvalidCharacter(Exception):
     def __init__(self, lnumber, character, message="Error"):
-        self.message = ("Błąd (linia %s): Nieprawidłowy znak %s" % (lnumber, character))
+        self.message = ("Błąd (linia %s): Nieprawidłowy zapis %s" % (lnumber, character))
         super().__init__(self.message)

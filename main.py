@@ -3,7 +3,6 @@ import math
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
-import traceback
 from exceptions import *
 import argparse
 
@@ -216,7 +215,7 @@ def add(a, b, bid):
             add_commands(["ADD b c"], bid)
 
 def sub(a, b, bid):
-    if evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid,
+    if b != 0 and evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid,
                           loadA=(a != 0 and a != 1), loadB=(b != 0 and b != 1)):
         if b == 1:
             add_commands(["DEC b"], bid)
@@ -348,8 +347,11 @@ def init_val(val, lineno):
         initialized.append(val)
 
 def check_variable(var, lineno):
-    if isinstance(var, tuple) and var[0] == 'tabi':
-        return check_variable(var[2], lineno)
+    if isinstance(var, tuple):
+        if var[1] not in initialized:
+            raise NotInitialized(var[1], lineno)
+        if var[0] == 'tabi':
+            return check_variable(var[2], lineno)
     elif not isinstance(var, int) and not isinstance(var, tuple) and var not in declared and var not in iterators:
         raise NotDeclared(var, lineno)
     elif not isinstance(var, int) and var not in initialized and var not in iterators:
@@ -519,23 +521,6 @@ def evaluate(ex, bid=0, justassign=False):
             raise NotInitialized(ex)
         return ex
 
-def compi(infi, save=False):
-    global memoryInd, bufferId, instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer
-    memoryInd, bufferId = 0, 0
-    instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer = [], [], [], [], [], [], {}, {}, {}, {}
-    with open(infi, 'r') as fp:
-        content = fp.read()
-        try:
-            parser.parse(content)
-            if save:
-                f = open("out.mr", 'w')
-                f.write('\n'.join(instructions))
-                f.close()
-            else:
-                print('\n'.join(instructions))
-        except Exception as e:
-            print(traceback.format_exc())
-
 parser = yacc.yacc()
 
 argp = argparse.ArgumentParser()
@@ -552,4 +537,4 @@ with open(args.input, 'r') as fp:
         f.close()
         print("Kompilacja i zapis zakończone pomyślnie")
     except Exception as e:
-        print(e)
+        sys.exit(e)
