@@ -9,6 +9,6 @@ BEGIN
 	ENDFOR
 
 	WRITE c;
-	
+
 END
 

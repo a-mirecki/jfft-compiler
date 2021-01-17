@@ -9,12 +9,12 @@ class BadKeyword(Exception):
         super().__init__(self.message)
 
 class NotDeclared(Exception):
-    def __init__(self, lnumber, word, message="Error"):
+    def __init__(self, word,  lnumber=None, message="Error"):
         self.message = ("Błąd w linijce %s, zmienna nie zadeklarowana: %s" % (lnumber, word))
         super().__init__(self.message)
 
 class AlreadyDeclared(Exception):
-    def __init__(self, lnumber, name, message="Error"):
+    def __init__(self,  name, lnumber=None, message="Error"):
         self.message = ("Błąd w linijce %s, zmienna uprzednio zadeklarowana: %s" % (lnumber, name))
         super().__init__(self.message)
 
@@ -30,12 +30,12 @@ class NotAVariable(Exception):
 
 class IteratorModification(Exception):
     def __init__(self, name, message="Error"):
-        self.message = ("Błąd, modyfikacja iteratora  %s w trakcie pętli" % (name))
+        self.message = ("Błąd, modyfikacja iteratora %s w trakcie pętli" % (name))
         super().__init__(self.message)
 
 class NotInitialized(Exception):
-    def __init__(self, name, message="Error"):
-        self.message = ("Błąd, zmienna nie zainicjalizowana: %s" % (name))
+    def __init__(self, name, lnumber=None, message="Error"):
+        self.message = ("Błąd w linii %s, zmienna nie zainicjalizowana: %s" % (lnumber, name))
         super().__init__(self.message)
 
 class ReusedIterator(Exception):
@@ -44,6 +44,6 @@ class ReusedIterator(Exception):
         super().__init__(self.message)
 
 class InvalidArrayElement(Exception):
-    def __init__(self, index, name, message="Error"):
+    def __init__(self, lnumber, index, name, message="Error"):
         self.message = ("Indeks %s nie istnieje tablicy %s " % (index,name))
         super().__init__(self.message)

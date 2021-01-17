@@ -103,12 +103,11 @@ def obtain_tab_value(tab, reg, bid):
 
 def assign(a, b, bid):
     if a in iterators and a in declared:
-        raise AlreadyDeclared(-1, a)
+        raise AlreadyDeclared(a)
     if a in iterators and a in memory:
-        raise IteratorModification(-1, a)
+        raise IteratorModification(a)
     elif a in iterators and a not in memory:
-        raise NotDeclared(-1, a)
-
+        raise NotDeclared(a)
     if isinstance(b, str):
         mem_to_reg(1, memory[b], bid)
     elif isinstance(b, int):
@@ -128,7 +127,6 @@ def assign(a, b, bid):
 
 def evaluate_io(a, reg, bid, isRead):
     global memoryInd
-
     if isinstance(a, str):
         if a in iterators and a in memory and isRead:
             raise IteratorModification(a)
@@ -166,10 +164,6 @@ def evaluate_operation(a, b, c, bid, rega=1, regb=2, performOperation=True, load
             elif isinstance(ev[0], int):
                 set_register(ev[1], ev[0], bid)
             else:
-                if ev[0] not in initialized:
-                    raise NotInitialized(-1, ev[0])
-                elif ev[0] not in memory:
-                    raise NotDeclared(-1, ev[0])
                 mem_to_reg(ev[1], memory[ev[0]], bid)
         return True
 
@@ -330,7 +324,7 @@ def p_declarations_array(p):
         raise InvalidArrayRange(p.lexer.lineno, p[ind + 2], p[ind + 4])
     p[0] = p[ind] if p[ind] not in declared else False
     if not p[0]:
-        raise AlreadyDeclared(p.lexer.lineno, p[ind])
+        raise AlreadyDeclared(p[ind], p.lexer.lineno)
     declared.append(p[ind])
     arrays[p[ind]] = (p[ind + 2], p[ind + 4])
 
@@ -340,7 +334,7 @@ def p_declarations_pid(p):
     ind = 1 if len(p) == 2 else 3
     p[0] = p[ind] if p[ind] not in declared else False
     if not p[0]:
-        raise AlreadyDeclared(p.lexer.lineno, p[ind])
+        raise AlreadyDeclared(p[ind], p.lexer.lineno)
     declared.append(p[ind])
 
 def p_commands(p):
@@ -352,8 +346,33 @@ def p_commands(p):
     else:
         p[0] = [p[1]]
 
+def init_val(val, lineno):
+    if val in iterators and val in declared:
+        raise AlreadyDeclared(val, lineno)
+    if isinstance(val, tuple):
+        if val[1] not in initialized:
+            initialized.append(val[1])
+            declare_variable(val)
+        if val[0] == 'tab' and val not in initialized:
+            initialized.append(val)
+    elif val not in initialized:
+        declare_variable(val)
+        initialized.append(val)
+
+def check_variable(var, lineno):
+    if isinstance(var, tuple) and var[0] == 'tabi':
+        return check_variable(var[2], lineno)
+    elif not isinstance(var, int) and not isinstance(var, tuple) and var not in declared and var not in iterators:
+        raise NotDeclared(var, lineno)
+    elif not isinstance(var, int) and var not in initialized and var not in iterators:
+        raise NotInitialized(var, lineno)
+
 def p_command_assign(p):
     ''' command	: identifier ASSIGN expression SEMICOLON '''
+    if isinstance(p[3], str) or (isinstance(p[3],tuple) and (p[3][0] == 'tab' or p[3][0] == 'tabi')):
+        check_variable(p[3], p.lexer.lineno)
+    if p[1] not in iterators:
+        init_val(p[1], p.lexer.lineno)
     p[0] = ("assign", p[1], p[3])
 
 def p_command_if(p):
@@ -373,17 +392,25 @@ def p_iterator(p):
     ''' iterator	: PID '''
     p[0] = p[1]
     if p[1] in memory:
-        raise AlreadyDeclared(p.lexer.lineno, p[1])
+        raise AlreadyDeclared(p[1], p.lexer.lineno)
     iterators.append(p[1])
 
 def p_command_for(p):
     ''' command	: FOR iterator FROM value TO value DO commands ENDFOR
             | FOR iterator FROM value DOWNTO value DO commands ENDFOR '''
+    if p[2] in declared:
+        raise AlreadyDeclared(p[2], p.lexer.lineno)
+    check_variable(p[4], p.lexer.lineno)
+    check_variable(p[6], p.lexer.lineno)
     p[0] = ("for", p[2], p[4], p[6], p[8]) if p[5] == 'TO' else ("downfor", p[2], p[4], p[6], p[8])
 
 def p_command_io(p):
     ''' command	: READ identifier SEMICOLON
             | WRITE value SEMICOLON '''
+    if p[1] == 'READ' and p[2] not in iterators:
+        init_val(p[2], p.lexer.lineno)
+    elif p[1] == 'WRITE':
+        check_variable(p[2], p.lexer.lineno)
     p[0] = ("read", p[2]) if p[1] == 'READ' else ("write", p[2])
 
 def p_expression_value(p):
@@ -396,6 +423,8 @@ def p_operation(p):
                   | value MUL value
                   | value DIV value
                   | value MOD value'''
+    check_variable(p[1], p.lexer.lineno)
+    check_variable(p[3], p.lexer.lineno)
     p[0] = (p[2], p[1], p[3])
 
 def p_condition(p):
@@ -405,6 +434,8 @@ def p_condition(p):
                   | value GREATER value
                   | value LOWEREQUAL value
                   | value GREATEREQUAL value'''
+    check_variable(p[1], p.lexer.lineno)
+    check_variable(p[3], p.lexer.lineno)
     p[0] = (p[2], p[1], p[3])
 
 def p_value_NUM(p):
@@ -418,7 +449,7 @@ def p_value_identifier(p):
 def p_identifier_pid(p):
     '''identifier	: PID '''
     if p[1] not in declared and p[1] not in iterators:
-        raise NotDeclared(p.lexer.lineno, p[1])
+        raise NotDeclared(p[1], p.lexer.lineno)
     if p[1] in arrays:
         raise NotAVariable(p.lexer.lineno, p[1])
     p[0] = (p[1])
@@ -427,7 +458,7 @@ def p_identifier_tab_id(p):
     '''identifier	: PID LBRACKET PID RBRACKET
                     | PID LBRACKET NUM RBRACKET '''
     if p[1] not in declared:
-        raise NotDeclared(p.lexer.lineno, p[1])
+        raise NotDeclared(p[1], p.lexer.lineno)
     if p[1] not in arrays:
         raise NotAnArray(p.lexer.lineno, p[1])
 
@@ -485,30 +516,18 @@ def evaluate(ex, bid=0, justassign=False):
         elif ex[0] == '/' or ex[0] == '%':
             div(evaluate(ex[1], bid), evaluate(ex[2], bid), bid, True if ex[0] == '%' else False)
         elif ex[0] == 'tab' or ex[0] == 'tabi':
-            if ex[1] not in initialized:
-                declare_variable(ex)
-                initialized.append(ex[1])
             if ex[0] == 'tab':
-                if ex[2] < arrays[ex[1]][0] or ex[2] > arrays[ex[1]][1]:
-                    raise InvalidArrayElement(ex[2], ex[1])
                 return (ex[0], ex[1], ex[2] - arrays[ex[1]][0])
             else:
-                if ex[2] not in declared and ex[2] not in iterators and not justassign:
-                    raise NotDeclared(-1, str(ex[2]))
-                if ex[2] not in initialized and not justassign:
-                    raise NotInitialized(ex[2])
                 indexes.append(memory[evaluate(ex[2], bid)])
         return ex
     else:
-        if isinstance(ex, str) and ex in iterators and ex not in uiterators and not justassign:
+        if isinstance(ex, str) and ex in iterators and ex not in uiterators and  not justassign: # TEST
             uiterators.append(ex)
         if isinstance(ex, str) and ex not in declared and ex not in iterators and not justassign:
-            raise NotDeclared(-1, str(ex))
+            raise NotDeclared(str(ex))
         if isinstance(ex, str) and ex not in initialized and not justassign:
             raise NotInitialized(ex)
-        if isinstance(ex, str) and ex not in initialized and ex not in iterators:
-            declare_variable(ex)
-            initialized.append(ex)
         return ex
 
 parser = yacc.yacc()
