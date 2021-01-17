@@ -6,9 +6,11 @@ import sys
 from exceptions import *
 import traceback
 
+''' CODE GOLF COMPILER - Arkadiusz Mirecki 250071 '''
 memoryInd, bufferId = 0, 0
 instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer, = [], [], [], [], [], [], {}, {}, {}, {}
 rtol = ["a", "b", "c", "d", "e", "f"]
+
 
 def clear_ins_buffer(*args):
     for arg in args:
@@ -58,7 +60,7 @@ def _for(iterator, _from, _to, reverse, bid):
     global memoryInd, instructionBuffer
     if isinstance(_from, int) and isinstance(_to, int):
         _from, _to = (0, _to - _from) if not reverse and _to >= _from and iterator not in uiterators else (
-        _from - _to, 0) if reverse and _from >= _to and iterator not in uiterators else (_from, _to)
+            _from - _to, 0) if reverse and _from >= _to and iterator not in uiterators else (_from, _to)
     evaluate_operation(_from, _to, 0, bid - 1, performOperation=False)
     memory[f"{iterator}_e"] = memoryInd
     memoryInd += 1
@@ -71,14 +73,12 @@ def _for(iterator, _from, _to, reverse, bid):
     mem_to_reg(2, memory[f"{iterator}_e"], bid + 1)
     reg_to_mem(1, memory[f"{iterator}"], bid + 2)
     if reverse:
-        add_commands(
-            [f"JZERO b {len(instructionBuffer[bid + 2]) + 6}", "DEC b"] + instructionBuffer[bid + 2], bid + 1)
+        add_commands([f"JZERO b {len(instructionBuffer[bid + 2]) + 6}", "DEC b"] + instructionBuffer[bid + 2], bid + 1)
         add_commands(["INC b", "SUB b c", "JZERO b 2 ",
-                      f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 3}"],
-                     bid + 1)
-        add_commands(["INC b", "SUB b c",
-                      f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"]
-                     + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
+                      f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 3}"], bid + 1)
+        add_commands(
+            ["INC b", "SUB b c", f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"]
+            + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
     else:
         add_commands(["INC b"] + instructionBuffer[bid + 2] + [
             f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 6 + len(instructionBuffer[bid + 2])}"],
@@ -146,9 +146,7 @@ def io(a, bid, isRead):
     add_commands(["GET a"] if isRead else ["PUT a"], bid)
 
 def to_load(a, rega, b, regb, loadA, loadB):
-    return {(True, True): [(b, regb), (a, rega)], (True, False): [(a, rega)], (False, True): [(b, regb)], (False, False): []}[
-        (loadA, loadB)]
-
+    return {(True, True): [(b, regb), (a, rega)], (True, False): [(a, rega)], (False, True): [(b, regb)], (False, False): []}[(loadA, loadB)]
 
 def evaluate_operation(a, b, c, bid, rega=1, regb=2, performOperation=True, loadB=True, loadA=True):
     add_commands(setBuffer=bid)
@@ -205,7 +203,7 @@ def _while(b1, b2):
 
 def _repeatuntil(b1, b2):
     add_commands(instructionBuffer[b1] + instructionBuffer[b2] + ["JZERO b 2", "JUMP 2",
-                                                                  f"JUMP -{len(instructionBuffer[b1]) + len(instructionBuffer[b2]) + 2}"], b1 - 1)
+               f"JUMP -{len(instructionBuffer[b1]) + len(instructionBuffer[b2]) + 2}"],b1 - 1)
 
 def add(a, b, bid):
     if b != 0 and evaluate_operation(a, b, a + b if isinstance(a, int) and isinstance(b, int) else -1, bid,
@@ -231,13 +229,15 @@ def mul(a, b, bid):
     if a == 0 or b == 0:
         return set_register(1, 0, bid)
     if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4, loadA=(a != 0
-            and a != 1 and not (isinstance(a, int) and a & (a - 1) == 0)), loadB=(b != 0 and b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
+                                                                                                           and a != 1 and not (
+                    isinstance(a, int) and a & (a - 1) == 0)),
+                          loadB=(b != 0 and b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
         if b == 1 or a == 1:
             add_commands(["RESET b", "ADD b %s" % ("e" if b == 1 else "c")], bid)
         elif isinstance(b, int) and b & (b - 1) == 0 or isinstance(a, int) and a & (a - 1) == 0:
             isBPower = isinstance(b, int) and b & (b - 1) == 0
             power = int(math.log2(b)) if isBPower else int(math.log2(a))
-            add_commands(["RESET b", "ADD b %s" % ("e" if isBPower else "c")] + ["SHL b"]*power, bid)
+            add_commands(["RESET b", "ADD b %s" % ("e" if isBPower else "c")] + ["SHL b"] * power, bid)
         else:
             add_commands(["RESET a", "ADD a e", "SUB a c", "JZERO a 13", 'RESET a', 'ADD a c',
                           'RESET d', 'ADD d e', 'RESET b', 'JZERO d 19', 'JODD d 2', 'JUMP 2', 'ADD b a',
@@ -249,22 +249,23 @@ def div(a, b, bid, modulo=False):
         return set_register(1, 0, bid)
     c = a % b if modulo and isinstance(a, int) and isinstance(b, int) else (
         a // b if isinstance(a, int) and isinstance(b, int) else -1)
-    if evaluate_operation(a, b, c, bid, loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0)) or modulo) and (b != 1 or modulo)):
+    if evaluate_operation(a, b, c, bid,
+                          loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0)) or modulo) and (
+                                  b != 1 or modulo)):
         if isinstance(b, int) and b & (b - 1) == 0 and not modulo:
             power = int(math.log2(b))
-            add_commands(["SHR b"]*power, bid)
+            add_commands(["SHR b"] * power, bid)
         else:
             add_commands(['JZERO c 27', 'RESET d', 'ADD d c', 'RESET f', 'ADD f d', 'SUB f b',
-                      'JZERO f 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET f', 'RESET e', 'ADD e d', 'SUB e b',
-                      'JZERO e 4', 'SHL f', 'SHR d', 'JUMP 5', 'SHL f', 'INC f', 'SUB b d', 'SHR d',
-                      'RESET e', 'ADD e c', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET b', 'RESET f']+
+                          'JZERO f 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET f', 'RESET e', 'ADD e d', 'SUB e b',
+                          'JZERO e 4', 'SHL f', 'SHR d', 'JUMP 5', 'SHL f', 'INC f', 'SUB b d', 'SHR d',
+                          'RESET e', 'ADD e c', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET b', 'RESET f'] +
                          (['RESET b', 'ADD b f'] if not modulo else []), bid)
-
 
 functions = {'+': add, '-': sub, '*': mul, '=': eq, '!=': neq, '>': gt, '<': lt, '>=': ge, '<=': le}
 
 dyn_tokens = {
-    'NUM': '', 'PID': '[_a-z]+', 'LBRACKET': '\(', 'RBRACKET': '\)',
+    'NUM': None, 'PID': '[_a-z]+', 'LBRACKET': '\(', 'RBRACKET': '\)',
     'ASSIGN': ':=', 'SEMICOLON': ';', 'COLON': ':', 'COMMA': ',', 'LOWER': '<',
     'GREATER': '>', 'LOWEREQUAL': '<=', 'GREATEREQUAL': '>=', 'EQUAL': '=',
     'NOTEQUAL': '!=', 'ADD': '\+', 'SUB': '\-', 'MUL': '\*', 'DIV': '\/',
@@ -277,23 +278,15 @@ keywords = [_ for _ in dyn_tokens.keys() if dyn_tokens[_] == '']
 tokens = list(dyn_tokens.keys())
 
 for key, value in dyn_tokens.items():
-    if key != False and value != '':
-        vars()['t_' + key] = value
+    if value is not None:
+        vars()['t_' + key] = value if value != '' else key
 
 t_ignore = ' \t'
-t_ignore_BLOCKCOMMENT = r'\[([^]]|[\r\n])*\]'
+t_ignore_BLOCKCOMMENT = r'\[[^\]]*\]'
 
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
-
-def t_KEYWORD(t):
-    r'[A-Z]+'
-    if t.value in keywords:
-        t.type = t.value
-        return t
-    else:
-        raise BadKeyword(t.lexer.lineno, t.value)
 
 def t_NUM(t):
     r'\d+'
@@ -304,11 +297,8 @@ def t_error(t):
     t.lexer.skip(1)
 
 lexer = lex.lex()
-
-precedence = (
-    ('left', 'ADD', 'SUB'),
-    ('left', 'MUL', 'DIV', 'MOD'),
-)
+precedence = (('left', 'ADD', 'SUB'),
+              ('left', 'MUL', 'DIV', 'MOD'))
 
 def p_program(p):
     ''' program 	: DECLARE declarations BEGIN commands END
@@ -370,7 +360,7 @@ def check_variable(var, lineno):
 
 def p_command_assign(p):
     ''' command	: identifier ASSIGN expression SEMICOLON '''
-    if isinstance(p[3], str) or (isinstance(p[3],tuple) and (p[3][0] == 'tab' or p[3][0] == 'tabi')):
+    if isinstance(p[3], str) or (isinstance(p[3], tuple) and (p[3][0] == 'tab' or p[3][0] == 'tabi')):
         check_variable(p[3], p.lineno(2))
     if p[1] not in iterators:
         init_val(p[1], p.lineno(1))
@@ -472,9 +462,6 @@ def p_error(p):
         raise InvalidCharacter(str(p.lineno), str(p.value))
     sys.exit("Błąd składni")
 
-def get_line_number():
-    pass
-
 def evaluate(ex, bid=0, justassign=False):
     if 'i' in memory and memory['i'] == 106:
         pass
@@ -489,7 +476,7 @@ def evaluate(ex, bid=0, justassign=False):
             evaluate(ex[1], bid + 1)
             evaluate(ex[2], bid + 2)
             _while(bid + 1, bid + 2) if ex[0] == 'while' else _repeatuntil(bid + 1, bid + 2)
-            clear_ins_buffer(bid + 1, bid+2)
+            clear_ins_buffer(bid + 1, bid + 2)
         elif ex[0] == 'downfor' or ex[0] == 'for':
             if ex[1] in initialized:
                 raise ReusedIterator(ex[1])
@@ -553,5 +540,6 @@ def compi(infi, save=False):
                 print('\n'.join(instructions))
         except Exception as e:
             print(traceback.format_exc())
+
 
 compi(sys.argv[1])

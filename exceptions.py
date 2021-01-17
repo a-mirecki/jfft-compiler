@@ -3,11 +3,6 @@ class InvalidArrayRange(Exception):
         self.message = ("Błąd (linia %s): Nieprawidłowy zakres tablicy: (a:b) = (%s:%s)" % (lnumber, a, b))
         super().__init__(self.message)
 
-class BadKeyword(Exception):
-    def __init__(self, lnumber, word, message="Error"):
-        self.message = ("Błąd (linia %s): Nieprawidłowe słowo kontrolne: %s" % (lnumber, word))
-        super().__init__(self.message)
-
 class NotDeclared(Exception):
     def __init__(self, word,  lnumber=None, message="Error"):
         lnumber = f' (linia {lnumber})' if lnumber else ''
