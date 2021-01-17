@@ -1,14 +1,5 @@
-[ error16.imp - modyfikacja iteratora w petli ]
 DECLARE
-	c
+    tab(10:20)
 BEGIN
-	c := 0;
-	FOR i FROM 1 TO 100 DO
-		c := c + i;
-		i := i % 2;
-	ENDFOR
-
-	WRITE c;
-
+    tab(21) := 5 ;
 END
-

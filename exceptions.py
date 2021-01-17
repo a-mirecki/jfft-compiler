@@ -45,5 +45,5 @@ class ReusedIterator(Exception):
 
 class InvalidArrayElement(Exception):
     def __init__(self, lnumber, index, name, message="Error"):
-        self.message = ("Indeks %s nie istnieje tablicy %s " % (index,name))
+        self.message = ("Błąd w linii %s: Indeks %s w tablicy %s nie istnieje  " % (lnumber, index,name))
         super().__init__(self.message)

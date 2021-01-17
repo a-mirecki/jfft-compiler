@@ -461,6 +461,8 @@ def p_identifier_tab_id(p):
         raise NotDeclared(p[1], p.lexer.lineno)
     if p[1] not in arrays:
         raise NotAnArray(p.lexer.lineno, p[1])
+    if isinstance(p[3], int) and (p[3] < arrays[p[1]][0] or p[3] > arrays[p[1]][1]):
+        raise InvalidArrayElement(p.lexer.lineno, p[3], p[1])
 
     p[0] = ("tab", p[1], (p[3])) if isinstance(p[3], int) else ("tabi", p[1], (p[3]))
 
