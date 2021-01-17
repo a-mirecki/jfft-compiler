@@ -468,10 +468,9 @@ def p_identifier_tab_id(p):
 
 def p_error(p):
     if hasattr(p, 'type'):
-        print("Błąd, nieprawidłowy znak: %s w linii %s" % (str(p.value), p.lineno))
-    else:
-        print("Błąd składni: " + str(p.value) + " " + str(p.lineno))
-    sys.exit(0)
+        raise InvalidCharacter(str(p.lineno), str(p.value))
+    sys.exit("Błąd składni")
+
 
 def evaluate(ex, bid=0, justassign=False):
     if 'i' in memory and memory['i'] == 106:

@@ -1,17 +1,17 @@
 class InvalidArrayRange(Exception):
     def __init__(self, lnumber, a, b, message="Error"):
-        self.message = ("Błąd (linia %s): Nieprawidlowy zakres tablicy: (a:b) = (%s:%s)" % (lnumber, a, b))
+        self.message = ("Błąd (linia %s): Nieprawidłowy zakres tablicy: (a:b) = (%s:%s)" % (lnumber, a, b))
         super().__init__(self.message)
 
 class BadKeyword(Exception):
     def __init__(self, lnumber, word, message="Error"):
-        self.message = ("Błąd (linia %s): Nieprawidlowe słowo kontrolne: %s" % (lnumber, word))
+        self.message = ("Błąd (linia %s): Nieprawidłowe słowo kontrolne: %s" % (lnumber, word))
         super().__init__(self.message)
 
 class NotDeclared(Exception):
     def __init__(self, word,  lnumber=None, message="Error"):
         lnumber = f' (linia {lnumber})' if lnumber else ''
-        self.message = ("Błąd%s: Zmienna nie zadeklarowana: %s" % (lnumber, word))
+        self.message = ("Błąd%s: Niezadeklarowana zmienna: %s" % (lnumber, word))
         super().__init__(self.message)
 
 class AlreadyDeclared(Exception):
@@ -38,7 +38,7 @@ class IteratorModification(Exception):
 class NotInitialized(Exception):
     def __init__(self, name, lnumber=None, message="Error"):
         lnumber = f' (linia {lnumber})' if lnumber else ''
-        self.message = ("Błąd%s: zmienna nie zainicjalizowana: %s" % (lnumber, name))
+        self.message = ("Błąd%s: Niezainicjalizowana zmienna: %s" % (lnumber, name))
         super().__init__(self.message)
 
 class ReusedIterator(Exception):
@@ -49,4 +49,9 @@ class ReusedIterator(Exception):
 class InvalidArrayElement(Exception):
     def __init__(self, lnumber, index, name, message="Error"):
         self.message = ("Błąd (linia %s): Indeks %s w tablicy %s nie istnieje  " % (lnumber, index,name))
+        super().__init__(self.message)
+
+class InvalidCharacter(Exception):
+    def __init__(self, lnumber, character, message="Error"):
+        self.message = ("Błąd (linia %s): Nieprawidłowy znak %s" % (lnumber, character))
         super().__init__(self.message)
