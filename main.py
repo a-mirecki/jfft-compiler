@@ -257,8 +257,9 @@ def div(a, b, bid, modulo=False):
             add_commands(['JZERO c 27', 'RESET d', 'ADD d c', 'RESET f', 'ADD f d', 'SUB f b',
                       'JZERO f 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET f', 'RESET e', 'ADD e d', 'SUB e b',
                       'JZERO e 4', 'SHL f', 'SHR d', 'JUMP 5', 'SHL f', 'INC f', 'SUB b d', 'SHR d',
-                      'RESET e', 'ADD e c', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET b', 'RESET f',
-                      'RESET a', 'ADD a b' if modulo else 'ADD a f'])
+                      'RESET e', 'ADD e c', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET b', 'RESET f']+
+                         (['RESET b', 'ADD b f'] if not modulo else []), bid)
+
 
 functions = {'+': add, '-': sub, '*': mul, '=': eq, '!=': neq, '>': gt, '<': lt, '>=': ge, '<=': le}
 
