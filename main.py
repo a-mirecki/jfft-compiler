@@ -145,16 +145,16 @@ def io(a, bid, isRead):
     evaluate_io(a, 2 if isRead else 1, bid, isRead)
     add_commands(["GET a"] if isRead else ["PUT a"], bid)
 
-def to_load(a, rega, b, regb, loadA, loadB):
-    return {(True, True): [(b, regb), (a, rega)], (True, False): [(a, rega)], (False, True): [(b, regb)], (False, False): []}[(loadA, loadB)]
+def to_load(a, b, loadA, loadB):
+    return {(True, True): [(b, 2), (a, 1)], (True, False): [(a, 1)], (False, True): [(b, 2)], (False, False): []}[(loadA, loadB)]
 
-def evaluate_operation(a, b, c, bid, rega=1, regb=2, performOperation=True, loadB=True, loadA=True):
+def evaluate_operation(a, b, c, bid, performOperation=True, loadB=True, loadA=True):
     add_commands(setBuffer=bid)
 
     if isinstance(a, int) and isinstance(b, int) and performOperation:
         set_register(1, c, bid)
     else:
-        for ev in to_load(a, rega, b, regb, loadA, loadB):
+        for ev in to_load(a, b, loadA, loadB):
             if isinstance(ev[0], tuple) and ev[0][0] == 'tab':
                 mem_to_reg(ev[1], memory[ev[0][1]] + ev[0][2], bid)
             elif isinstance(ev[0], tuple) and ev[0][0] == 'tabi':
@@ -228,19 +228,23 @@ def sub(a, b, bid):
 def mul(a, b, bid):
     if a == 0 or b == 0:
         return set_register(1, 0, bid)
-    if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, 4, loadA=(a != 0 and a != 1 and not (
-    isinstance(a, int) and a & (a - 1) == 0)), loadB=(b != 0 and b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
-        if b == 1 or a == 1:
-            add_commands(["RESET b", "ADD b %s" % ("e" if b == 1 else "c")], bid)
+    if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, loadA=(a != 1 and not (
+    isinstance(a, int) and a & (a - 1) == 0)), loadB=(b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
+        if a == 1:
+            add_commands(["RESET b", "ADD b c"], bid)
+        elif b == 1:
+            pass
         elif isinstance(b, int) and b & (b - 1) == 0 or isinstance(a, int) and a & (a - 1) == 0:
             isBPower = isinstance(b, int) and b & (b - 1) == 0
             power = int(math.log2(b)) if isBPower else int(math.log2(a))
-            add_commands(["RESET b", "ADD b %s" % ("e" if isBPower else "c")] + ["SHL b"] * power, bid)
+            if not isBPower:
+                add_commands(["RESET b", "ADD b c"], bid)
+            add_commands(["SHL b"] * power, bid)
         else:
-            add_commands(["RESET a", "ADD a e", "SUB a c", "JZERO a 13", 'RESET a', 'ADD a c',
-                          'RESET d', 'ADD d e', 'RESET b', 'JZERO d 19', 'JODD d 2', 'JUMP 2', 'ADD b a',
-                          'SHL a', 'SHR d', 'JUMP -6', 'RESET a', 'ADD a e', 'RESET d', 'ADD d c', 'RESET b',
-                          'JZERO d 7', 'JODD d 2', 'JUMP 2', 'ADD b a', 'SHL a', 'SHR d', 'JUMP -6'], bid)
+            add_commands(["RESET e", "ADD e b", "SUB b c", "JZERO b 10", "RESET b", "JODD c 2", "JUMP 2",
+                          "ADD b e", "SHL e", "SHR c", "JZERO c 2", "JUMP -6", "JUMP 8", "JODD e 2", "JUMP 2",
+                          "ADD b c", "SHL c", "SHR e", "JZERO e 2", "JUMP -6"], bid)
+
 
 def div(a, b, bid, modulo=False):
     if a == 0 or b == 0:
