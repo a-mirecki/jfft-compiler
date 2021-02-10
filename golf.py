@@ -430,12 +430,10 @@ argp.add_argument('output', help='output file (*.mr)')
 args = argp.parse_args()
 
 with open(args.input, 'r') as fp:
-    content = fp.read()
     try:
-        parser.parse(content)
-        f = open(args.output, 'w')
-        f.write('\n'.join(instructions))
-        f.close()
+        parser.parse(fp.read())
+        with open(args.output, 'w') as f:
+            f.write('\n'.join(instructions))
         print("Kompilacja i zapis zakończone pomyślnie")
     except Exception as e:
         sys.exit(e)

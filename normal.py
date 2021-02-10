@@ -7,7 +7,7 @@ import sys
 from exceptions import *
 import argparse
 
-''' CODE GOLF COMPILER - Arkadiusz Mirecki 250071 '''
+''' CODE GOLF COMPILER - normal version'''
 memoryInd, bufferId = 0, 0
 instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer, = [], [], [], [], [], [], {}, {}, {}, {}
 rtol = ["a", "b", "c", "d", "e", "f"]
@@ -534,12 +534,10 @@ argp.add_argument('output', help='output file (*.mr)')
 args = argp.parse_args()
 
 with open(args.input, 'r') as fp:
-    content = fp.read()
     try:
-        parser.parse(content)
-        f = open(args.output, 'w')
-        f.write('\n'.join(instructions))
-        f.close()
+        parser.parse(fp.read())
+        with open(args.output, 'w') as f:
+            f.write('\n'.join(instructions))
         print("Kompilacja i zapis zakończone pomyślnie")
     except Exception as e:
         sys.exit(e)
