@@ -1,4 +1,4 @@
-# JFTT Compiler 
+# JFTT Code Golf Compiler 
 This is my compiler for JFTT course.
 
 I wasn't focusing much on optimization as I wanted to take part in code golf challenge but my compiler got 4.0 anyway
