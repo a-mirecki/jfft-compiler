@@ -63,12 +63,13 @@ def _for(iterator, _from, _to, reverse, bid):
     mem_to_reg(2, memory[f"{iterator}_e"], bid + 1)
     reg_to_mem(1, memory[f"{iterator}"], bid + 2)
     if reverse:
-        add_commands([f"JZERO b {len(instructionBuffer[bid + 2]) + 6}", "DEC b"] + instructionBuffer[bid + 2] + ["INC b", "SUB b c", "JZERO b 2 ", f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 3}"], bid + 1)
+        add_commands([f"JZERO b {len(instructionBuffer[bid + 2]) + 6}", "DEC b"] + instructionBuffer[bid + 2], bid + 1)
+        add_commands(["INC b", "SUB b c", "JZERO b 2 ", f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 3}"], bid + 1)
         add_commands(["INC b", "SUB b c", f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"] + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
     else:
-        add_commands(["INC b"] + instructionBuffer[bid + 2] + [f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 6 + len(instructionBuffer[bid + 2])}"], bid + 1)
-        add_commands(["INC c", "SUB c b", "RESET b", "ADD b c", f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"]  + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
-    instructionBuffer[bid + 1], instructionBuffer[bid + 2] = insBufBack1, insBufBack2
+        add_commands(["INC b"] + instructionBuffer[bid + 2] + [ f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 6 + len(instructionBuffer[bid + 2])}"], bid + 1)
+        add_commands(["INC c", "SUB c b", "RESET b", "ADD b c", f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"] + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
+        instructionBuffer[bid + 1], instructionBuffer[bid + 2] = insBufBack1, insBufBack2
 
 def obtain_tab_address(tab, reg, bid):
     ind = indexes.pop()
