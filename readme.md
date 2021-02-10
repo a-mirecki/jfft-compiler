@@ -7,3 +7,5 @@ Usage:
 python3 main.py <input file> <output file>
 
 If you have any questions about my compiler or need help, feel free to contact me
+
+PS I know this compiler is badly formatted but it doesn't matter while you write codegolf code
