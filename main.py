@@ -1,20 +1,18 @@
 import copy
 import math
-import traceback
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
 from exceptions import *
 import argparse
 
-''' CODE GOLF COMPILER - Arkadiusz Mirecki 250071 '''
+''' CODE GOLF COMPILER - I know this code is not well-formated and easy to read but the main challenge was to write a compiler in under 600 lines '''
 memoryInd, bufferId = 0, 0
 instructions, initialized, declared, iterators, indexes, uiterators, arrays, usages, memory, instructionBuffer, = [], [], [], [], [], [], {}, {}, {}, {}
 rtol = ["a", "b", "c", "d", "e", "f"]
 
 def clear_ins_buffer(*args):
-    for arg in args:
-        instructionBuffer[arg] = []
+    for arg in args: instructionBuffer[arg] = []
 
 def add_commands(commands=None, setBuffer=-1):
     global instructions, instructionBuffer, bufferId
@@ -59,35 +57,24 @@ def set_register(reg, val, bid):
 def _for(iterator, _from, _to, reverse, bid):
     global memoryInd, instructionBuffer
     if isinstance(_from, int) and isinstance(_to, int):
-        _from, _to = (0, _to - _from) if not reverse and _to >= _from and iterator not in uiterators else (
-            _from - _to, 0) if reverse and _from >= _to and iterator not in uiterators else (_from, _to)
+        _from, _to = (0, _to - _from) if not reverse and _to >= _from and iterator not in uiterators else (_from - _to, 0) if reverse and _from >= _to and iterator not in uiterators else (_from, _to)
     evaluate_operation(_from, _to, 0, bid - 1, performOperation=False)
     memory[f"{iterator}_e"] = memoryInd
     memoryInd += 1
     reg_to_mem(1, memory[f"{iterator}"], bid - 1)
     reg_to_mem(2, memory[f"{iterator}_e"], bid - 1)
-    insBufBack1 = copy.deepcopy(instructionBuffer[bid + 1]) if bid + 1 in instructionBuffer else []
-    insBufBack2 = copy.deepcopy(instructionBuffer[bid + 2]) if bid + 2 in instructionBuffer else []
+    insBufBack1, insBufBack2 = copy.deepcopy(instructionBuffer[bid + 1]) if bid + 1 in instructionBuffer else [], copy.deepcopy(instructionBuffer[bid + 2]) if bid + 2 in instructionBuffer else []
     clear_ins_buffer(bid + 1, bid + 2)
     mem_to_reg(1, memory[f"{iterator}"], bid + 1)
     mem_to_reg(2, memory[f"{iterator}_e"], bid + 1)
     reg_to_mem(1, memory[f"{iterator}"], bid + 2)
     if reverse:
-        add_commands([f"JZERO b {len(instructionBuffer[bid + 2]) + 6}", "DEC b"] + instructionBuffer[bid + 2], bid + 1)
-        add_commands(["INC b", "SUB b c", "JZERO b 2 ",
-                      f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 3}"], bid + 1)
-        add_commands(
-            ["INC b", "SUB b c", f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"]
-            + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
+        add_commands([f"JZERO b {len(instructionBuffer[bid + 2]) + 6}", "DEC b"] + instructionBuffer[bid + 2] + ["INC b", "SUB b c", "JZERO b 2 ", f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 3}"], bid + 1)
+        add_commands(["INC b", "SUB b c", f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"] + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
     else:
-        add_commands(["INC b"] + instructionBuffer[bid + 2] + [
-            f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 6 + len(instructionBuffer[bid + 2])}"],
-                     bid + 1)
-        add_commands(["INC c", "SUB c b", "RESET b", "ADD b c",
-                      f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"]
-                     + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
-    instructionBuffer[bid + 1] = insBufBack1
-    instructionBuffer[bid + 2] = insBufBack2
+        add_commands(["INC b"] + instructionBuffer[bid + 2] + [f"JUMP -{len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 6 + len(instructionBuffer[bid + 2])}"], bid + 1)
+        add_commands(["INC c", "SUB c b", "RESET b", "ADD b c", f"JZERO b {len(instructionBuffer[bid]) + len(instructionBuffer[bid + 1]) + 1}"]  + instructionBuffer[bid] + instructionBuffer[bid + 1], bid - 1)
+    instructionBuffer[bid + 1], instructionBuffer[bid + 2] = insBufBack1, insBufBack2
 
 def obtain_tab_address(tab, reg, bid):
     ind = indexes.pop()
@@ -149,8 +136,6 @@ def to_load(a, b, loadA, loadB):
     return {(True, True): [(b, 2), (a, 1)], (True, False): [(a, 1)], (False, True): [(b, 2)], (False, False): []}[(loadA, loadB)]
 
 def evaluate_operation(a, b, c, bid, performOperation=True, loadB=True, loadA=True):
-    add_commands(setBuffer=bid)
-
     if isinstance(a, int) and isinstance(b, int) and performOperation:
         set_register(1, c, bid)
     else:
@@ -171,8 +156,7 @@ def neq(a, b, bid):
 
 def eq(a, b, bid):
     if evaluate_operation(a, b, int(a == b) if isinstance(a, int) and isinstance(b, int) else -1, bid):
-        add_commands(["RESET e", "RESET d", "ADD d b", "SUB d c", "JZERO d 2", "JUMP 5",
-                      "SUB c b", "JZERO c 2", "JUMP 2", "INC e", "RESET b", "ADD b e"], bid)
+        add_commands(["RESET e", "RESET d", "ADD d b", "SUB d c", "JZERO d 2", "JUMP 5", "SUB c b", "JZERO c 2", "JUMP 2", "INC e", "RESET b", "ADD b e"], bid)
 
 def ge(a, b, bid):
     if evaluate_operation(a, b, int(a >= b) if isinstance(a, int) and isinstance(b, int) else -1, bid):
@@ -198,16 +182,13 @@ def _ifelse(b1, b2):
         f"JUMP {len(instructionBuffer[b2]) + 1}"] + instructionBuffer[b2], b1 - 1)
 
 def _while(b1, b2):
-    add_commands(instructionBuffer[b1] + [f"JZERO b {len(instructionBuffer[b2]) + 2}"] + instructionBuffer[b2] + [
-        f"JUMP -{len(instructionBuffer[b2]) + len(instructionBuffer[b1]) + 1}"], b1 - 1)
+    add_commands(instructionBuffer[b1] + [f"JZERO b {len(instructionBuffer[b2]) + 2}"] + instructionBuffer[b2] + [f"JUMP -{len(instructionBuffer[b2]) + len(instructionBuffer[b1]) + 1}"], b1 - 1)
 
 def _repeatuntil(b1, b2):
-    add_commands(instructionBuffer[b1] + instructionBuffer[b2] + ["JZERO b 2", "JUMP 2",
-               f"JUMP -{len(instructionBuffer[b1]) + len(instructionBuffer[b2]) + 2}"],b1 - 1)
+    add_commands(instructionBuffer[b1] + instructionBuffer[b2] + ["JZERO b 2", "JUMP 2", f"JUMP -{len(instructionBuffer[b1]) + len(instructionBuffer[b2]) + 2}"],  b1 - 1)
 
 def add(a, b, bid):
-    if b != 0 and evaluate_operation(a, b, a + b if isinstance(a, int) and isinstance(b, int) else -1, bid,
-                                     loadA=(a != 0 and a != 1), loadB=(b != 0 and b != 1)):
+    if b != 0 and evaluate_operation(a, b, a + b if isinstance(a, int) and isinstance(b, int) else -1, bid, loadA=(a != 0 and a != 1), loadB=(b != 0 and b != 1)):
         if b == 1:
             add_commands(["INC b"], bid)
         elif a == 0 or a == 1:
@@ -215,9 +196,9 @@ def add(a, b, bid):
         elif b != 0:
             add_commands(["ADD b c"], bid)
 
+
 def sub(a, b, bid):
-    if b != 0 and evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid,
-                          loadA=(a != 0 and a != 1), loadB=(b != 0 and b != 1)):
+    if b != 0 and evaluate_operation(a, b, a - b if isinstance(a, int) and isinstance(b, int) and a - b >= 0 else 0, bid, loadA=(a != 0 and a != 1), loadB=(b != 0 and b != 1)):
         if b == 1:
             add_commands(["DEC b"], bid)
         elif a == 0 or a == 1:
@@ -228,12 +209,12 @@ def sub(a, b, bid):
 def mul(a, b, bid):
     if a == 0 or b == 0:
         return set_register(1, 0, bid)
-    if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, loadA=(a != 1 and not (
-    isinstance(a, int) and a & (a - 1) == 0)), loadB=(b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
+    if evaluate_operation(a, b, a * b if isinstance(a, int) and isinstance(b, int) else -1, bid, loadA=(a != 1 and not (isinstance(a, int) and a & (a - 1) == 0)),
+                          loadB=(b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))):
         if a == 1:
             add_commands(["RESET b", "ADD b c"], bid)
         elif b == 1:
-            pass
+            return
         elif isinstance(b, int) and b & (b - 1) == 0 or isinstance(a, int) and a & (a - 1) == 0:
             isBPower = isinstance(b, int) and b & (b - 1) == 0
             power = int(math.log2(b)) if isBPower else int(math.log2(a))
@@ -241,39 +222,29 @@ def mul(a, b, bid):
                 add_commands(["RESET b", "ADD b c"], bid)
             add_commands(["SHL b"] * power, bid)
         else:
-            add_commands(["RESET e", "ADD e b", "SUB b c", "JZERO b 10", "RESET b", "JODD c 2", "JUMP 2",
-                          "ADD b e", "SHL e", "SHR c", "JZERO c 2", "JUMP -6", "JUMP 8", "JODD e 2", "JUMP 2",
-                          "ADD b c", "SHL c", "SHR e", "JZERO e 2", "JUMP -6"], bid)
-
+            add_commands(["RESET e", "ADD e b", "SUB b c", "JZERO b 10", "RESET b", "JODD c 2", "JUMP 2","ADD b e", "SHL e", "SHR c",
+                          "JZERO c 2", "JUMP -6", "JUMP 8", "JODD e 2", "JUMP 2", "ADD b c", "SHL c", "SHR e", "JZERO e 2", "JUMP -6"], bid)
 
 def div(a, b, bid, modulo=False):
     if a == 0 or b == 0:
         return set_register(1, 0, bid)
-    c = a % b if modulo and isinstance(a, int) and isinstance(b, int) else (
-        a // b if isinstance(a, int) and isinstance(b, int) else -1)
-    if evaluate_operation(a, b, c, bid, loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0))
-                                               or modulo) and (b != 1 or modulo)):
+    c = a % b if modulo and isinstance(a, int) and isinstance(b, int) else (a // b if isinstance(a, int) and isinstance(b, int) else -1)
+    if evaluate_operation(a, b, c, bid, loadB=((b != 1 and not (isinstance(b, int) and b & (b - 1) == 0)) or modulo) and (b != 1 or modulo)):
         if isinstance(b, int) and b & (b - 1) == 0 and not modulo:
             power = int(math.log2(b))
             add_commands(["SHR b"] * power, bid)
         else:
-            add_commands(['JZERO c 27', 'RESET d', 'ADD d c', 'RESET f', 'ADD f d', 'SUB f b',
-                          'JZERO f 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET f', 'RESET e', 'ADD e d', 'SUB e b',
-                          'JZERO e 4', 'SHL f', 'SHR d', 'JUMP 5', 'SHL f', 'INC f', 'SUB b d', 'SHR d',
-                          'RESET e', 'ADD e c', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET b', 'RESET f'] +
-                         (['RESET b', 'ADD b f'] if not modulo else []), bid)
+            add_commands(['JZERO c 27', 'RESET d', 'ADD d c', 'RESET f', 'ADD f d', 'SUB f b', 'JZERO f 2', 'JUMP 3', 'SHL d', 'JUMP -6', 'RESET f',
+                          'RESET e', 'ADD e d', 'SUB e b', 'JZERO e 4', 'SHL f', 'SHR d', 'JUMP 5', 'SHL f', 'INC f', 'SUB b d', 'SHR d', 'RESET e',
+                          'ADD e c', 'SUB e d', 'JZERO e -14', 'JUMP 3', 'RESET b', 'RESET f'] + (['RESET b', 'ADD b f'] if not modulo else []), bid)
 
 functions = {'+': add, '-': sub, '*': mul, '=': eq, '!=': neq, '>': gt, '<': lt, '>=': ge, '<=': le}
 
 dyn_tokens = {
-    'NUM': None, 'PID': '[_a-z]+', 'LBRACKET': '\(', 'RBRACKET': '\)',
-    'ASSIGN': ':=', 'SEMICOLON': ';', 'COLON': ':', 'COMMA': ',', 'LOWER': '<',
-    'GREATER': '>', 'LOWEREQUAL': '<=', 'GREATEREQUAL': '>=', 'EQUAL': '=',
-    'NOTEQUAL': '!=', 'ADD': '\+', 'SUB': '\-', 'MUL': '\*', 'DIV': '\/',
-    'MOD': '\%', 'DECLARE': '', 'BEGIN': '', 'END': '', 'IF': '',
-    'THEN': '', 'ELSE': '', 'ENDIF': '', 'WHILE': '', 'DO': '',
-    'ENDWHILE': '', 'REPEAT': '', 'UNTIL': '', 'FOR': '', 'FROM': '',
-    'TO': '', 'DOWNTO': '', 'ENDFOR': '', 'READ': '', 'WRITE': ''}
+    'NUM': None, 'PID': '[_a-z]+', 'LBRACKET': '\(', 'RBRACKET': '\)', 'ASSIGN': ':=', 'SEMICOLON': ';', 'COLON': ':', 'COMMA': ',', 'LOWER': '<',
+    'GREATER': '>', 'LOWEREQUAL': '<=', 'GREATEREQUAL': '>=', 'EQUAL': '=', 'NOTEQUAL': '!=', 'ADD': '\+', 'SUB': '\-', 'MUL': '\*', 'DIV': '\/',
+    'MOD': '\%', 'DECLARE': '', 'BEGIN': '', 'END': '', 'IF': '', 'THEN': '', 'ELSE': '', 'ENDIF': '', 'WHILE': '', 'DO': '',
+    'ENDWHILE': '', 'REPEAT': '', 'UNTIL': '', 'FOR': '', 'FROM': '', 'TO': '', 'DOWNTO': '', 'ENDFOR': '', 'READ': '', 'WRITE': ''}
 
 keywords = [_ for _ in dyn_tokens.keys() if dyn_tokens[_] == '']
 tokens = list(dyn_tokens.keys())
