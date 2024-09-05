@@ -1,7 +1,7 @@
 # JFTT Code Golf Compiler 
-This is my compiler for JFTT course.
+This is my compiler written in Python
 
-I wasn't focusing much on optimization as I wanted to take part in code golf challenge but my compiler got 4.0 anyway
+I wasn't focusing much on optimization as I wanted to take part in code golf challenge
 
 There are two versions of it: first (golf.py) that has lower than 500 lines and the normal one (normal.py)
 
