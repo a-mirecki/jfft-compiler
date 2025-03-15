@@ -1,5 +1,5 @@
 # JFTT Code Golf Compiler 
-This is my compiler written in Python
+This is my compiler written in Python for my studies
 
 I wasn't focusing much on optimization as I wanted to take part in code golf challenge
 
